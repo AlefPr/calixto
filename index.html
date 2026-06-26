@@ -5,24 +5,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Consulta de Planos e Serviços</title>
   <style>
-    /* Estilos básicos para manter tudo limpo */
-    body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-    .search-container { margin-bottom: 30px; }
-    #busca-cidade { width: 100%; padding: 15px; font-size: 18px; border-radius: 8px; border: 1px solid #ccc; }
-    .card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; background: #f9f9f9; }
-    .plan-tag { display: inline-block; background: #007bff; color: white; padding: 5px 10px; border-radius: 4px; margin-right: 5px; font-size: 14px;}
+    /* Estilo Dark Moderno */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #121214;
+      color: #e1e1e6;
+    }
+    .search-container {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    h2 {
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    #busca-cidade {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 2px solid #29292e;
+      background-color: #202024;
+      color: #ffffff;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    #busca-cidade:focus {
+      border-color: #007bff;
+    }
+    .card {
+      border: 1px solid #29292e;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      background: #202024;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    .plan-container {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .plan-tag {
+      background: #29292e;
+      color: #e1e1e6;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #323238;
+      font-size: 14px;
+    }
+    .sem-resultado {
+      color: #7c7c8a;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
   <div class="search-container">
     <h2>Consulta de Cidades</h2>
-    <input type="text" id="busca-cidade" placeholder="Digite o nome da cidade..." autocomplete="off">
+    <input type="text" id="busca-cidade" placeholder="Digite o nome da cidade para consultar..." autocomplete="off">
   </div>
 
   <div id="resultados">
     </div>
 
-  <script src="app.js"></script></body></html>
+  <script src="app.js"></script>
 </body>
 </html>
