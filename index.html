@@ -3,82 +3,111 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consulta de Planos e Serviços</title>
+  <title>Dashboard NOC | Consulta de Cidades</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
-    /* Estilo Dark Moderno */
+    /* Estilo Dark NOC Profissional */
+    :root {
+      --bg-app: #0e0e11;
+      --bg-card: #18181b;
+      --bg-kpi: #27272a;
+      --border-color: #3f3f46;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-alert: #f59e0b;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      padding: 40px 20px;
-      max-width: 800px;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      padding: 30px 20px;
+      max-width: 900px;
       margin: 0 auto;
-      background-color: #121214;
-      color: #e1e1e6;
+      background-color: var(--bg-app);
+      color: var(--text-main);
     }
-    .search-container {
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    h2 {
-      color: #ffffff;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
+
+    .header-container { text-align: center; margin-bottom: 30px; }
+    .header-container h2 { display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; font-size: 1.5rem; margin-bottom: 20px;}
+
     #busca-cidade {
       width: 100%;
-      padding: 16px;
+      padding: 18px 20px;
       font-size: 16px;
       border-radius: 8px;
-      border: 2px solid #29292e;
-      background-color: #202024;
-      color: #ffffff;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-card);
+      color: var(--text-main);
       outline: none;
-      box-sizing: border-box;
-      transition: border-color 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: all 0.2s;
     }
-    #busca-cidade:focus {
-      border-color: #007bff;
+    #busca-cidade:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+
+    /* Filtros Rápidos */
+    .filter-container { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+    .filter-btn {
+      background: transparent; border: 1px solid var(--border-color); color: var(--text-muted);
+      padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer;
+      transition: all 0.2s; display: flex; align-items: center; gap: 6px;
     }
+    .filter-btn:hover { border-color: var(--text-muted); }
+    .filter-btn.active { background: var(--accent-blue); border-color: var(--accent-blue); color: #fff; }
+
+    /* Card Principal */
     .card {
-      border: 1px solid #29292e;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      background: #202024;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border: 1px solid var(--border-color); padding: 25px;
+      border-radius: 12px; margin-bottom: 20px; background: var(--bg-card);
     }
-    .card h3 {
-      margin-top: 0;
-      color: #007bff;
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+    .card-header h3 { margin: 0; font-size: 1.4rem; display: flex; align-items: center; gap: 8px; color: var(--accent-blue); }
+    .pop-badge { font-size: 12px; background: var(--bg-kpi); padding: 4px 10px; border-radius: 6px; color: var(--text-muted); border: 1px solid var(--border-color); }
+
+    /* KPIs (Indicadores Visuais) */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 25px; }
+    .kpi-box { background: var(--bg-kpi); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .kpi-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; display: block; }
+    .kpi-value { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+    /* Tabela de Planos */
+    .section-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    
+    .plan-row {
+      display: grid; grid-template-columns: 120px 1fr 100px; gap: 15px; align-items: center;
+      padding: 12px 10px; border-bottom: 1px solid #27272a; transition: background 0.2s;
     }
-    .plan-container {
-      margin-top: 15px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .plan-tag {
-      background: #29292e;
-      color: #e1e1e6;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid #323238;
-      font-size: 14px;
-    }
-    .sem-resultado {
-      color: #7c7c8a;
-      text-align: center;
+    .plan-row:hover { background: #1e1e22; border-radius: 6px; }
+    .plan-row:last-child { border-bottom: none; }
+    
+    .p-speed { font-weight: 700; font-size: 15px; color: var(--text-main); }
+    .p-services { font-size: 13px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 6px; }
+    .service-tag { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-size: 11px; border: 1px solid rgba(255,255,255,0.1); }
+    .p-price { font-weight: 600; color: var(--accent-green); text-align: right; }
+
+    /* Taxas */
+    .tax-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tax-tag {
+      background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--accent-alert); padding: 8px 12px; border-radius: 6px; font-size: 13px;
+      display: flex; align-items: center; gap: 6px;
     }
   </style>
 </head>
 <body>
 
-  <div class="search-container">
-    <h2>Consulta de Cidades</h2>
-    <input type="text" id="busca-cidade" placeholder="Digite o nome da cidade para consultar..." autocomplete="off">
+  <div class="header-container">
+    <h2><i class="ph ph-hard-drives"></i> NOC | Consulta de Cobertura</h2>
+    <input type="text" id="busca-cidade" placeholder="Digite a cidade ou região (ex: Palmas)..." autocomplete="off">
+    
+    <div class="filter-container">
+      <button class="filter-btn active" data-filter="todos"><i class="ph ph-squares-four"></i> Todos</button>
+      <button class="filter-btn" data-filter="internet"><i class="ph ph-wifi-high"></i> Apenas Internet</button>
+      <button class="filter-btn" data-filter="combo"><i class="ph ph-monitor-play"></i> Combos / Streaming</button>
+    </div>
   </div>
 
-  <div id="resultados">
-    </div>
+  <div id="resultados"></div>
 
   <script src="app.js"></script>
 </body>
