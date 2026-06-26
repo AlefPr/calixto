@@ -6,7 +6,6 @@ const divResultados = document.getElementById('resultados');
 let dadosCidades = [];
 
 // 1. Carrega o JSON direto da raiz do repositório
-// Ajuste para './cidades.json' se você já renomeou o arquivo no GitHub
 fetch('./cidades.json')
   .then(response => {
     if (!response.ok) {
@@ -15,13 +14,12 @@ fetch('./cidades.json')
     return response.json();
   })
   .then(data => {
-    // Garante que estamos lidando com uma lista/array
     dadosCidades = Array.isArray(data) ? data : [];
     console.log("Dados carregados com sucesso!", dadosCidades);
   })
   .catch(error => {
     console.error("Erro ao carregar o arquivo JSON:", error);
-    divResultados.innerHTML = `<p class="sem-resultado">Erro ao carregar banco de dados. Verifique o nome do arquivo JSON.</p>`;
+    divResultados.innerHTML = `<p class="sem-resultado">Erro ao carregar banco de dados.</p>`;
   });
 
 // 2. Evento de escuta para a busca em tempo real
@@ -34,12 +32,13 @@ inputBusca.addEventListener('input', (evento) => {
   // Só pesquisa se o usuário digitar pelo menos 2 letras
   if (termoDigitado.length < 2) return;
 
-  // Filtra blindando contra registros nulos, vazios ou sem a propriedade 'cidade'
+  // Filtra usando 'Column1' que é onde está o nome da cidade no seu JSON
   const cidadesFiltradas = dadosCidades.filter(item => {
     return item && 
-           item.cidade && 
-           typeof item.cidade === 'string' && 
-           item.cidade.toLowerCase().includes(termoDigitado);
+           item.Column1 && 
+           typeof item.Column1 === 'string' && 
+           item.Column1.toLowerCase().includes(termoDigitado) &&
+           item.Column1.toUpperCase() !== "CIDADE"; // Ignora a linha de cabeçalho se houver
   });
 
   // Se não encontrar nada
@@ -48,31 +47,28 @@ inputBusca.addEventListener('input', (evento) => {
     return;
   }
 
-  // 3. Renderiza os cards na tela
+  // 3. Renderiza os cards na tela mapeando suas colunas
   cidadesFiltradas.forEach(cidadeData => {
-    // Trata os planos caso existam no objeto
-    let planosHtml = '';
-    if (cidadeData.planos && Array.isArray(cidadeData.planos)) {
-      planosHtml = cidadeData.planos.map(plano => {
-        const nomePlano = plano.nome || 'Plano Sem Nome';
-        const valorPlano = plano.valor ? `R$ ${Number(plano.valor).toFixed(2)}` : 'Consulte';
-        return `<span class="plan-tag">📦 ${nomePlano} - ${valorPlano}</span>`;
-      }).join('');
-    }
+    
+    // Vamos coletar as informações das colunas existentes para exibir no card
+    const cidadeNome = cidadeData.Column1;
+    const regiaoPOP = cidadeData.Column2 || '';
+    
+    // Lista para agrupar as informações de planos/serviços que estão nas colunas 4, 5, 7...
+    let infoTags = [];
+    
+    if (cidadeData.Column4) infoTags.push(`<span class="plan-tag">📦 ${cidadeData.Column4}</span>`);
+    if (cidadeData.Column5) infoTags.push(`<span class="plan-tag">📦 ${cidadeData.Column5}</span>`);
+    if (cidadeData.Column6) infoTags.push(`<span class="plan-tag">📦 ${cidadeData.Column6}</span>`);
+    if (cidadeData.Column7) infoTags.push(`<span class="plan-tag">⚙️ ${cidadeData.Column7}</span>`);
 
-    // Trata os serviços adicionais caso existam
-    const servicos = (cidadeData.servicos_adicionais && Array.isArray(cidadeData.servicos_adicionais)) 
-      ? cidadeData.servicos_adicionais.join(', ') 
-      : 'Nenhum serviço adicional cadastrado';
-
-    // Monta a estrutura do Card
+    // Monta a estrutura do Card usando os novos campos
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <h3>📍 ${cidadeData.cidade} ${cidadeData.estado ? `- ${cidadeData.estado}` : ''}</h3>
-      <p><strong>Serviços Disponíveis:</strong> ${servicos}</p>
-      <div class="plan-container">
-        ${planosHtml || '<span class="sem-resultado">Nenhum plano disponível</span>'}
+      <h3>📍 ${cidadeNome} ${regiaoPOP ? `(${regiaoPOP})` : ''}</h3>
+      <div class="plan-container" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;">
+        ${infoTags.join('') || '<span class="sem-resultado">Sem informações adicionais</span>'}
       </div>
     `;
     
