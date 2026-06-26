@@ -1,56 +1,82 @@
-// Referências aos elementos do HTML
+// Referências aos elementos da tela
 const inputBusca = document.getElementById('busca-cidade');
 const divResultados = document.getElementById('resultados');
 
-// Variável para armazenar os dados da planilha (JSON)
+// Armazenará os dados vindos do JSON
 let dadosCidades = [];
 
-// 1. Carrega os dados do arquivo JSON direto da raiz
+// 1. Carrega o JSON direto da raiz do repositório
+// Ajuste para './cidades.json' se você já renomeou o arquivo no GitHub
 fetch('./cidades.json')
-  .then(response => response.json())
-  .then(data => {
-    dadosCidades = data;
-    console.log("Dados carregados com sucesso!");
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: status ${response.status}`);
+    }
+    return response.json();
   })
-  .catch(error => console.error("Erro ao carregar os dados:", error));
+  .then(data => {
+    // Garante que estamos lidando com uma lista/array
+    dadosCidades = Array.isArray(data) ? data : [];
+    console.log("Dados carregados com sucesso!", dadosCidades);
+  })
+  .catch(error => {
+    console.error("Erro ao carregar o arquivo JSON:", error);
+    divResultados.innerHTML = `<p class="sem-resultado">Erro ao carregar banco de dados. Verifique o nome do arquivo JSON.</p>`;
+  });
 
-// 2. Cria o evento de busca em tempo real
+// 2. Evento de escuta para a busca em tempo real
 inputBusca.addEventListener('input', (evento) => {
   const termoDigitado = evento.target.value.toLowerCase().trim();
   
-  // Limpa a tela a cada nova digitação
+  // Limpa a tela a cada caractere digitado
   divResultados.innerHTML = '';
 
-  // Se apagar tudo ou digitar menos de 2 letras, não mostra nada
+  // Só pesquisa se o usuário digitar pelo menos 2 letras
   if (termoDigitado.length < 2) return;
 
-  // Filtra as cidades que contêm o termo digitado
-  const cidadesFiltradas = dadosCidades.filter(item => 
-    item.cidade.toLowerCase().includes(termoDigitado)
-  );
+  // Filtra blindando contra registros nulos, vazios ou sem a propriedade 'cidade'
+  const cidadesFiltradas = dadosCidades.filter(item => {
+    return item && 
+           item.cidade && 
+           typeof item.cidade === 'string' && 
+           item.cidade.toLowerCase().includes(termoDigitado);
+  });
 
-  // 3. Renderiza os resultados na tela
+  // Se não encontrar nada
   if (cidadesFiltradas.length === 0) {
-    divResultados.innerHTML = '<p>Nenhuma cidade encontrada.</p>';
+    divResultados.innerHTML = '<p class="sem-resultado">Nenhuma cidade encontrada com esse nome.</p>';
     return;
   }
 
+  // 3. Renderiza os cards na tela
   cidadesFiltradas.forEach(cidadeData => {
-    // Monta as tags dos planos
-    const planosHtml = cidadeData.planos.map(plano => 
-      `<span class="plan-tag">${plano.nome} - R$ ${plano.valor.toFixed(2)}</span>`
-    ).join('');
+    // Trata os planos caso existam no objeto
+    let planosHtml = '';
+    if (cidadeData.planos && Array.isArray(cidadeData.planos)) {
+      planosHtml = cidadeData.planos.map(plano => {
+        const nomePlano = plano.nome || 'Plano Sem Nome';
+        const valorPlano = plano.valor ? `R$ ${Number(plano.valor).toFixed(2)}` : 'Consulte';
+        return `<span class="plan-tag">📦 ${nomePlano} - ${valorPlano}</span>`;
+      }).join('');
+    }
 
-    // Cria o elemento visual do card
+    // Trata os serviços adicionais caso existam
+    const servicos = (cidadeData.servicos_adicionais && Array.isArray(cidadeData.servicos_adicionais)) 
+      ? cidadeData.servicos_adicionais.join(', ') 
+      : 'Nenhum serviço adicional cadastrado';
+
+    // Monta a estrutura do Card
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <h3>${cidadeData.cidade} - ${cidadeData.estado}</h3>
-      <p><strong>Serviços:</strong> ${cidadeData.servicos_adicionais.join(', ')}</p>
-      <div>${planosHtml}</div>
+      <h3>📍 ${cidadeData.cidade} ${cidadeData.estado ? `- ${cidadeData.estado}` : ''}</h3>
+      <p><strong>Serviços Disponíveis:</strong> ${servicos}</p>
+      <div class="plan-container">
+        ${planosHtml || '<span class="sem-resultado">Nenhum plano disponível</span>'}
+      </div>
     `;
     
-    // Adiciona o card na tela
+    // Injeta o card na div de resultados
     divResultados.appendChild(card);
   });
 });
