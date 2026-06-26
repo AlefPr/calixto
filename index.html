@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard NOC | Consulta de Cidades</title>
+  <title>NOC | Consulta de Cobertura</title>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
     /* Estilo Dark NOC Profissional */
@@ -60,38 +60,45 @@
       border: 1px solid var(--border-color); padding: 25px;
       border-radius: 12px; margin-bottom: 20px; background: var(--bg-card);
     }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
-    .card-header h3 { margin: 0; font-size: 1.4rem; display: flex; align-items: center; gap: 8px; color: var(--accent-blue); }
-    .pop-badge { font-size: 12px; background: var(--bg-kpi); padding: 4px 10px; border-radius: 6px; color: var(--text-muted); border: 1px solid var(--border-color); }
+    
+    /* Novo Cabeçalho ajustado */
+    .card-header { margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+    .card-header h3 { margin: 0 0 6px 0; font-size: 1.6rem; display: flex; align-items: center; gap: 8px; color: var(--accent-blue); }
+    .pop-subtitle { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
 
     /* KPIs (Indicadores Visuais) */
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 25px; }
-    .kpi-box { background: var(--bg-kpi); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); }
-    .kpi-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; display: block; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 25px; }
+    .kpi-box { background: var(--bg-kpi); padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .kpi-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; display: block; letter-spacing: 0.5px; }
     .kpi-value { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .status-ok { color: var(--accent-green); }
 
     /* Tabela de Planos */
-    .section-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
     
     .plan-row {
       display: grid; grid-template-columns: 120px 1fr 100px; gap: 15px; align-items: center;
-      padding: 12px 10px; border-bottom: 1px solid #27272a; transition: background 0.2s;
+      padding: 14px 15px; border-bottom: 1px solid #27272a; transition: background 0.2s;
     }
     .plan-row:hover { background: #1e1e22; border-radius: 6px; }
     .plan-row:last-child { border-bottom: none; }
     
     .p-speed { font-weight: 700; font-size: 15px; color: var(--text-main); }
     .p-services { font-size: 13px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 6px; }
-    .service-tag { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-size: 11px; border: 1px solid rgba(255,255,255,0.1); }
-    .p-price { font-weight: 600; color: var(--accent-green); text-align: right; }
+    .service-tag { background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid rgba(255,255,255,0.1); color: #d4d4d8;}
+    
+    /* Preço com cor neutra/clara para não roubar a atenção */
+    .p-price { font-weight: 600; color: var(--text-main); text-align: right; }
 
     /* Taxas */
     .tax-grid { display: flex; flex-wrap: wrap; gap: 10px; }
     .tax-tag {
-      background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);
-      color: var(--accent-alert); padding: 8px 12px; border-radius: 6px; font-size: 13px;
-      display: flex; align-items: center; gap: 6px;
+      background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);
+      color: var(--text-muted); padding: 8px 14px; border-radius: 6px; font-size: 13px;
+      display: flex; align-items: center; gap: 6px; transition: all 0.2s;
     }
+    .tax-tag:hover { background: rgba(255, 255, 255, 0.08); }
+    .tax-price { color: var(--text-main); font-weight: 600; margin-left: 4px; }
   </style>
 </head>
 <body>
