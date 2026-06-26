@@ -5,11 +5,12 @@ const divResultados = document.getElementById('resultados');
 // Variável para armazenar os dados da planilha (JSON)
 let dadosCidades = [];
 
-// 1. Carrega os dados do arquivo JSON
-fetch('./data/cidades.json')
+// 1. Carrega os dados do arquivo JSON direto da raiz
+fetch('./cidades.json')
   .then(response => response.json())
   .then(data => {
     dadosCidades = data;
+    console.log("Dados carregados com sucesso!");
   })
   .catch(error => console.error("Erro ao carregar os dados:", error));
 
