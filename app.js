@@ -2,77 +2,121 @@
 const inputBusca = document.getElementById('busca-cidade');
 const divResultados = document.getElementById('resultados');
 
-// Armazenará os dados vindos do JSON
-let dadosCidades = [];
+// Armazenará os dados agrupados por cidade nos bastidores
+let bancosDeDadosCidades = {};
 
-// 1. Carrega o JSON direto da raiz do repositório
+// 1. Carrega e estrutura o JSON corrido
 fetch('./cidades.json')
   .then(response => {
-    if (!response.ok) {
-      throw new Error(`Erro HTTP: status ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Erro HTTP: status ${response.status}`);
     return response.json();
   })
   .then(data => {
-    dadosCidades = Array.isArray(data) ? data : [];
-    console.log("Dados carregados com sucesso!", dadosCidades);
+    let cidadeAtual = "";
+    let popAtual = "";
+
+    data.forEach(item => {
+      // Ignora linhas nulas ou linhas de cabeçalho da planilha
+      if (!item || item.Column1 === "CIDADE") return;
+
+      // Se a linha tem uma nova cidade, atualiza a cidade ativa no laço
+      if (item.Column1 && typeof item.Column1 === 'string' && item.Column1.trim() !== "") {
+        cidadeAtual = item.Column1.trim().toUpperCase();
+        popAtual = item.Column2 ? item.Column2.trim() : cidadeAtual;
+        
+        // Inicializa a estrutura da cidade se ela não existir
+        if (!bancosDeDadosCidades[cidadeAtual]) {
+          bancosDeDadosCidades[cidadeAtual] = {
+            cidade: cidadeAtual,
+            pop: popAtual,
+            planos: [],
+            taxas: []
+          };
+        }
+      }
+
+      // Se temos uma cidade ativa, agrupamos os planos e taxas desta linha
+      if (cidadeAtual) {
+        // Coleta planos da Column4 e Column5
+        if (item.Column4 && item.Column4.trim() !== "") {
+          bancosDeDadosCidades[cidadeAtual].planos.push(item.Column4.trim());
+        }
+        if (item.Column5 && item.Column5.trim() !== "") {
+          bancosDeDadosCidades[cidadeAtual].planos.push(item.Column5.trim());
+        }
+        
+        // Coleta taxas e serviços (Column7 + Column8 se houver valor)
+        if (item.Column7 && item.Column7.trim() !== "") {
+          const valorTaxa = item.Column8 !== undefined ? ` (R$ ${item.Column8})` : '';
+          bancosDeDadosCidades[cidadeAtual].taxas.push(`${item.Column7.trim()}${valorTaxa}`);
+        }
+      }
+    });
+
+    console.log("Dados processados com sucesso!", bancosDeDadosCidades);
   })
   .catch(error => {
     console.error("Erro ao carregar o arquivo JSON:", error);
     divResultados.innerHTML = `<p class="sem-resultado">Erro ao carregar banco de dados.</p>`;
   });
 
-// 2. Evento de escuta para a busca em tempo real
+// 2. Evento de busca em tempo real
 inputBusca.addEventListener('input', (evento) => {
   const termoDigitado = evento.target.value.toLowerCase().trim();
   
-  // Limpa a tela a cada caractere digitado
   divResultados.innerHTML = '';
 
-  // Só pesquisa se o usuário digitar pelo menos 2 letras
+  // Só pesquisa com 2 ou mais letras
   if (termoDigitado.length < 2) return;
 
-  // Filtra usando 'Column1' que é onde está o nome da cidade no seu JSON
-  const cidadesFiltradas = dadosCidades.filter(item => {
-    return item && 
-           item.Column1 && 
-           typeof item.Column1 === 'string' && 
-           item.Column1.toLowerCase().includes(termoDigitado) &&
-           item.Column1.toUpperCase() !== "CIDADE"; // Ignora a linha de cabeçalho se houver
-  });
+  // Filtra as chaves do objeto (nomes das cidades) que batem com a busca
+  const chavesFiltradas = Object.keys(bancosDeDadosCidades).filter(nomeCidade => 
+    nomeCidade.toLowerCase().includes(termoDigitado)
+  );
 
-  // Se não encontrar nada
-  if (cidadesFiltradas.length === 0) {
+  if (chavesFiltradas.length === 0) {
     divResultados.innerHTML = '<p class="sem-resultado">Nenhuma cidade encontrada com esse nome.</p>';
     return;
   }
 
-  // 3. Renderiza os cards na tela mapeando suas colunas
-  cidadesFiltradas.forEach(cidadeData => {
-    
-    // Vamos coletar as informações das colunas existentes para exibir no card
-    const cidadeNome = cidadeData.Column1;
-    const regiaoPOP = cidadeData.Column2 || '';
-    
-    // Lista para agrupar as informações de planos/serviços que estão nas colunas 4, 5, 7...
-    let infoTags = [];
-    
-    if (cidadeData.Column4) infoTags.push(`<span class="plan-tag">📦 ${cidadeData.Column4}</span>`);
-    if (cidadeData.Column5) infoTags.push(`<span class="plan-tag">📦 ${cidadeData.Column5}</span>`);
-    if (cidadeData.Column6) infoTags.push(`<span class="plan-tag">📦 ${cidadeData.Column6}</span>`);
-    if (cidadeData.Column7) infoTags.push(`<span class="plan-tag">⚙️ ${cidadeData.Column7}</span>`);
+  // 3. Renderiza os blocos organizados na tela
+  chavesFiltradas.forEach(chave => {
+    const dados = bancosDeDadosCidades[chave];
 
-    // Monta a estrutura do Card usando os novos campos
+    // Remove duplicatas de planos se houverem na listagem
+    const planosUnicos = [...new Set(dados.planos)];
+    const taxasUnicas = [...new Set(dados.taxas)];
+
+    // Monta as tags visuais de planos
+    const planosHtml = planosUnicos.map(plano => 
+      `<span class="plan-tag">📦 ${plano}</span>`
+    ).join('');
+
+    // Monta as tags visuais de taxas e serviços
+    const taxasHtml = taxasUnicas.map(taxa => 
+      `<span class="plan-tag" style="border-color: #e2a03f; color: #f4b455;">⚙️ ${taxa}</span>`
+    ).join('');
+
+    // Cria o card unificado na tela
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <h3>📍 ${cidadeNome} ${regiaoPOP ? `(${regiaoPOP})` : ''}</h3>
-      <div class="plan-container" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;">
-        ${infoTags.join('') || '<span class="sem-resultado">Sem informações adicionais</span>'}
+      <h3>📍 ${dados.cidade}</h3>
+      <p style="font-size: 14px; color: #7c7c8a; margin-top: -5px; margin-bottom: 15px;">
+        <strong>Atendimento (POP):</strong> ${dados.pop}
+      </p>
+      
+      <h4>Planos Disponíveis</h4>
+      <div class="plan-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+        ${planosHtml || '<span class="sem-resultado">Nenhum plano listado</span>'}
+      </div>
+
+      <h4>Taxas e Serviços</h4>
+      <div class="plan-container" style="display: flex; flex-wrap: wrap; gap: 8px;">
+        ${taxasHtml || '<span class="sem-resultado">Nenhuma taxa listada</span>'}
       </div>
     `;
     
-    // Injeta o card na div de resultados
     divResultados.appendChild(card);
   });
 });
