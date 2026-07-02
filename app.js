@@ -6,17 +6,23 @@ let bancosDeDadosCidades = {};
 let filtroAtivo = 'todos'; 
 
 // 1. Carregamento de Dados
-fetch('./cidades.json')
+fetch('./cidades.json') // Lembre-se de garantir que o nome do arquivo no GitHub seja esse
   .then(response => response.json())
   .then(data => {
     let cidadeAtual = "";
     let popAtual = "";
 
     data.forEach(item => {
-      if (!item || item.Column1 === "CIDADE") return;
+      if (!item) return;
 
-      if (item.Column1 && typeof item.Column1 === 'string' && item.Column1.trim() !== "") {
-        cidadeAtual = item.Column1.trim().toUpperCase();
+      // Correção de compatibilidade: Aceita a coluna com nome vazio ("") ou "Column1"
+      const colunaCidade = item[""] || item.Column1;
+
+      // Ignora o cabeçalho da planilha
+      if (colunaCidade === "CIDADE") return;
+
+      if (colunaCidade && typeof colunaCidade === 'string' && colunaCidade.trim() !== "") {
+        cidadeAtual = colunaCidade.trim().toUpperCase();
         popAtual = item.Column2 ? item.Column2.trim() : cidadeAtual;
         
         if (!bancosDeDadosCidades[cidadeAtual]) {
