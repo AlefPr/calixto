@@ -176,7 +176,7 @@ function renderizarBusca() {
       `;
     }).join('');
 
-    // RENDERIZAÇÃO DAS TAXAS COM NEON VERDE
+    // RENDERIZAÇÃO DAS TAXAS COM A REGRA INTELIGENTE DO NEON
     const taxasHtml = taxasUnicas.map(taxa => {
       let displayValor = '';
       if (taxa.valor !== '') {
@@ -187,13 +187,14 @@ function renderizarBusca() {
         }
       }
 
-      // Inteligência do Neon: Caça a palavra "DESCONTO" e adiciona as classes Premium
       let classeExtra = '';
       let icone = 'ph-receipt'; 
       
-      if (taxa.nome.toUpperCase().includes('DESCONTO')) {
+      // REGRA: Se tem a palavra DESCONTO e NÃO tem "SEM DESCONTO", ele acende o Neon.
+      const nomeUpper = taxa.nome.toUpperCase();
+      if (nomeUpper.includes('DESCONTO') && !nomeUpper.includes('SEM DESCONTO')) {
         classeExtra = 'tax-discount';
-        icone = 'ph-ticket'; // Ícone de Etiqueta/Ticket promocional
+        icone = 'ph-ticket'; // Ícone de Etiqueta Promocional
       }
 
       return `<div class="tax-tag ${classeExtra}"><i class="ph-duotone ${icone} tax-icon"></i> ${taxa.nome} ${displayValor}</div>`;
