@@ -87,7 +87,7 @@ function interpretarPlano(textoPlano) {
     if (matchVelocidade) {
       velocidade = matchVelocidade[1].replace(/ /g, '');
     }
-    servicosFormatados = ["Link Dedicado SCM (Corp)"];
+    servicosFormatados = ["Conexão Multimídia SCM (Empresarial)"];
     categoria = 'corp';
   } 
   // Lógica para Planos Residenciais
