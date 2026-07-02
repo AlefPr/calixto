@@ -6,7 +6,7 @@ let bancosDeDadosCidades = {};
 let filtroAtivo = 'todos'; 
 
 // 1. Carregamento de Dados
-fetch('./cidades.json') // Lembre-se de garantir que o nome do arquivo no GitHub seja esse
+fetch('./cidades.json')
   .then(response => response.json())
   .then(data => {
     let cidadeAtual = "";
@@ -15,10 +15,7 @@ fetch('./cidades.json') // Lembre-se de garantir que o nome do arquivo no GitHub
     data.forEach(item => {
       if (!item) return;
 
-      // Correção de compatibilidade: Aceita a coluna com nome vazio ("") ou "Column1"
       const colunaCidade = item[""] || item.Column1;
-
-      // Ignora o cabeçalho da planilha
       if (colunaCidade === "CIDADE") return;
 
       if (colunaCidade && typeof colunaCidade === 'string' && colunaCidade.trim() !== "") {
@@ -48,8 +45,8 @@ fetch('./cidades.json') // Lembre-se de garantir que o nome do arquivo no GitHub
 function formatarNomeServico(nome) {
   let n = nome.toLowerCase().trim();
   if (n === 'sky/paramout' || n === 'sky/paramount') return 'Sky/Paramount';
-  if (n === '01rot.' || n === '1rot.' || n === '01 rot.') return 'Rota 1';
-  if (n === '02rot.' || n === '2rot.' || n === '02 rot.') return 'Rota 2';
+  if (n === '01rot.' || n === '1rot.' || n === '01 rot.') return '1 Roteador';
+  if (n === '02rot.' || n === '2rot.' || n === '02 rot.') return '2 Roteadores';
   if (n === 'deezer') return 'Deezer';
   if (n === 'max') return 'Max';
   return n.charAt(0).toUpperCase() + n.slice(1);
@@ -61,26 +58,48 @@ function obterClasseTag(servico) {
   if(s.includes('deezer')) return 'tag-deezer';
   if(s.includes('max')) return 'tag-max';
   if(s.includes('sky')) return 'tag-sky';
-  if(s.includes('rota')) return 'tag-rota';
+  if(s.includes('roteador')) return 'tag-roteador';
+  if(s.includes('scm') || s.includes('corp')) return 'tag-corp';
   return 'tag-default';
 }
 
-// 3. Parsing Matemático
+// 3. Parsing Avançado
 function interpretarPlano(textoPlano) {
-  const partes = textoPlano.split('-');
-  const precoOriginal = partes.length > 1 ? partes.pop().trim() : 'Consulte';
-  const descricao = partes.join('-').trim();
-  
-  const precoLimpo = precoOriginal.replace(/R\$\s*R\$/g, 'R$').replace(/R\$\s*/g, 'R$ ');
+  let precoLimpo = 'Consulte';
+  let descricao = textoPlano.trim();
 
-  const itensRaw = descricao.split('+').map(i => i.trim()).filter(i => i !== "");
-  
-  let velocidade = itensRaw.shift() || "N/A";
-  velocidade = velocidade.replace("Gbps Mbps", "Gbps").replace(/ /g, '');
+  // Caça o valor em Reais na string (Ex: "R$ 139,99" ou "R$ 248,00")
+  const regexPreco = /[-–\s]*R\$\s*([\d.,]+)/i;
+  const matchPreco = descricao.match(regexPreco);
 
-  const servicosFormatados = itensRaw.map(formatarNomeServico);
-  const temStreaming = servicosFormatados.some(i => i.includes('Deezer') || i.includes('Max') || i.includes('Sky'));
-  const categoria = temStreaming ? 'combo' : 'internet';
+  if (matchPreco) {
+    precoLimpo = "R$ " + matchPreco[1];
+    descricao = descricao.replace(matchPreco[0], '').trim(); 
+  }
+
+  let velocidade = "N/A";
+  let servicosFormatados = [];
+  let categoria = 'internet';
+
+  // Lógica Especial para Planos Corporativos
+  if (descricao.toLowerCase().includes('scm') || descricao.toLowerCase().includes('corp')) {
+    const matchVelocidade = descricao.match(/^(\d+\s*(?:Mbps|Gbps))/i);
+    if (matchVelocidade) {
+      velocidade = matchVelocidade[1].replace(/ /g, '');
+    }
+    servicosFormatados = ["Link Dedicado SCM (Corp)"];
+    categoria = 'corp';
+  } 
+  // Lógica para Planos Residenciais
+  else {
+    const itensRaw = descricao.split('+').map(i => i.trim()).filter(i => i !== "");
+    velocidade = itensRaw.shift() || "N/A";
+    velocidade = velocidade.replace("Gbps Mbps", "Gbps").replace(/ /g, '');
+    
+    servicosFormatados = itensRaw.map(formatarNomeServico);
+    const temStreaming = servicosFormatados.some(i => i.includes('Deezer') || i.includes('Max') || i.includes('Sky'));
+    categoria = temStreaming ? 'combo' : 'internet';
+  }
 
   return { velocidade, servicos: servicosFormatados, preco: precoLimpo, categoria };
 }
@@ -117,7 +136,7 @@ function renderizarBusca() {
     const planosProcessados = planosUnicos.map(interpretarPlano);
     const planosFiltrados = planosProcessados.filter(p => filtroAtivo === 'todos' || p.categoria === filtroAtivo);
 
-    // Renderiza Linhas com Tags Coloridas
+    // Renderiza Linhas
     const linhasPlanosHtml = planosFiltrados.map(plano => {
       const badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
       return `
