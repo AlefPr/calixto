@@ -136,6 +136,33 @@ function renderizarBusca() {
     const planosProcessados = planosUnicos.map(interpretarPlano);
     const planosFiltrados = planosProcessados.filter(p => filtroAtivo === 'todos' || p.categoria === filtroAtivo);
 
+    // === ALGORITMO DE ORDENAÇÃO (MENOR VELOCIDADE -> MAIOR PREÇO) ===
+    planosFiltrados.sort((a, b) => {
+      // Converte velocidade para número (em Megas)
+      const getSpeed = (str) => {
+        if (!str || str === "N/A") return 0;
+        let val = parseFloat(str.replace(/[^0-9.]/g, '')); // Pega só o número
+        if (str.toLowerCase().includes('gbps')) val *= 1000; // Converte Gbps para Mbps
+        return val;
+      };
+
+      // Converte preço para número
+      const getPrice = (str) => {
+        if (str.toLowerCase() === 'consulte') return 999999; // Joga "Consulte" pro final
+        return parseFloat(str.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+      };
+
+      const speedA = getSpeed(a.velocidade);
+      const speedB = getSpeed(b.velocidade);
+
+      // Ordena primeiro pela velocidade (Crescente)
+      if (speedA !== speedB) return speedA - speedB;
+
+      // Se a velocidade for igual, desempata pelo preço (Crescente)
+      return getPrice(a.preco) - getPrice(b.preco);
+    });
+    // ===============================================================
+
     // Renderiza Linhas
     const linhasPlanosHtml = planosFiltrados.map(plano => {
       const badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
