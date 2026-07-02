@@ -59,7 +59,7 @@ function obterClasseTag(servico) {
   if(s.includes('max')) return 'tag-max';
   if(s.includes('sky')) return 'tag-sky';
   if(s.includes('roteador')) return 'tag-roteador';
-  if(s.includes('scm') || s.includes('corp')) return 'tag-corp';
+  if(s.includes('scm') || s.includes('empresarial')) return 'tag-corp';
   return 'tag-default';
 }
 
@@ -68,7 +68,7 @@ function interpretarPlano(textoPlano) {
   let precoLimpo = 'Consulte';
   let descricao = textoPlano.trim();
 
-  // Caça o valor em Reais na string (Ex: "R$ 139,99" ou "R$ 248,00")
+  // Extrai o valor em Reais
   const regexPreco = /[-–\s]*R\$\s*([\d.,]+)/i;
   const matchPreco = descricao.match(regexPreco);
 
@@ -81,7 +81,7 @@ function interpretarPlano(textoPlano) {
   let servicosFormatados = [];
   let categoria = 'internet';
 
-  // Lógica Especial para Planos Corporativos
+  // Lógica Especial para Planos Empresariais (SCM)
   if (descricao.toLowerCase().includes('scm') || descricao.toLowerCase().includes('corp')) {
     const matchVelocidade = descricao.match(/^(\d+\s*(?:Mbps|Gbps))/i);
     if (matchVelocidade) {
@@ -136,50 +136,46 @@ function renderizarBusca() {
     const planosProcessados = planosUnicos.map(interpretarPlano);
     const planosFiltrados = planosProcessados.filter(p => filtroAtivo === 'todos' || p.categoria === filtroAtivo);
 
-    // === ALGORITMO DE ORDENAÇÃO (MENOR VELOCIDADE -> MAIOR PREÇO) ===
+    // === LÓGICA DE ORDENAÇÃO (Sorting) ===
     planosFiltrados.sort((a, b) => {
-      // Converte velocidade para número (em Megas)
       const getSpeed = (str) => {
         if (!str || str === "N/A") return 0;
-        let val = parseFloat(str.replace(/[^0-9.]/g, '')); // Pega só o número
-        if (str.toLowerCase().includes('gbps')) val *= 1000; // Converte Gbps para Mbps
+        let val = parseFloat(str.replace(/[^0-9.]/g, ''));
+        if (str.toLowerCase().includes('gbps')) val *= 1000;
         return val;
       };
 
-      // Converte preço para número
       const getPrice = (str) => {
-        if (str.toLowerCase() === 'consulte') return 999999; // Joga "Consulte" pro final
+        if (str.toLowerCase() === 'consulte') return 999999;
         return parseFloat(str.replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
       };
 
       const speedA = getSpeed(a.velocidade);
       const speedB = getSpeed(b.velocidade);
 
-      // Ordena primeiro pela velocidade (Crescente)
+      // Desempata primeiro pela velocidade (menor para maior)
       if (speedA !== speedB) return speedA - speedB;
-
-      // Se a velocidade for igual, desempata pelo preço (Crescente)
+      // Depois pelo preço (menor para maior)
       return getPrice(a.preco) - getPrice(b.preco);
     });
-    // ===============================================================
 
-   // Renderiza Linhas
+    // === RENDERIZAÇÃO DAS LINHAS ===
     const linhasPlanosHtml = planosFiltrados.map(plano => {
       const badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
-      
-      // Ajuste visual do "Link Limpo"
       const visualServicos = badgesServicos || '<span style="opacity: 0.4; font-size: 12px; font-style: italic;">Sem serviços adicionais</span>';
       
-      // Cria o texto formatado que será copiado para a área de transferência
-      const textoCopia = `*Plano:* ${plano.velocidade}\n*Serviços:* ${plano.servicos.length > 0 ? plano.servicos.join(', ') : 'Nenhum'}\n*Valor:* ${plano.preco}`;
-
       return `
         <div class="plan-row">
           <div class="p-speed">${plano.velocidade}</div>
           <div class="p-services">${visualServicos}</div>
           <div class="price-wrapper">
             <span class="p-price font-mono">${plano.preco}</span>
-            <button class="copy-btn" title="Copiar informações do plano" onclick="navigator.clipboard.writeText('${textoCopia}')">
+            <button class="copy-btn" 
+                    title="Copiar para WhatsApp"
+                    data-cidade="${dados.cidade}"
+                    data-velocidade="${plano.velocidade}"
+                    data-servicos="${plano.servicos.length > 0 ? plano.servicos.join(', ') : 'Nenhum'}"
+                    data-preco="${plano.preco}">
               <i class="ph-duotone ph-copy" style="font-size: 18px;"></i>
             </button>
           </div>
@@ -187,7 +183,7 @@ function renderizarBusca() {
       `;
     }).join('');
 
-    // Renderiza Taxas
+    // === RENDERIZAÇÃO DAS TAXAS ===
     const taxasHtml = taxasUnicas.map(taxa => {
       let displayValor = '';
       if (taxa.valor !== '') {
@@ -200,6 +196,7 @@ function renderizarBusca() {
       return `<div class="tax-tag"><i class="ph-duotone ph-receipt tax-icon"></i> ${taxa.nome} ${displayValor}</div>`;
     }).join('');
 
+    // === MONTAGEM DO CARD FINAL ===
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -225,7 +222,14 @@ function renderizarBusca() {
 
       <div class="section-title"><i class="ph-duotone ph-package"></i> Tabela de Provisionamento</div>
       <div class="table-container">
-        ${linhasPlanosHtml || '<div style="padding: 20px; color: var(--text-muted); text-align: center; font-size: 14px;">Nenhum plano corresponde ao filtro selecionado.</div>'}
+        ${linhasPlanosHtml ? `
+          <div class="table-header">
+            <div>Velocidade</div>
+            <div>Serviços Adicionais</div>
+            <div style="text-align: right; padding-right: 35px;">Valor Mensal</div>
+          </div>
+          ${linhasPlanosHtml}
+        ` : '<div style="padding: 20px; color: var(--text-muted); text-align: center; font-size: 14px;">Nenhum plano corresponde ao filtro selecionado.</div>'}
       </div>
 
       <div class="section-title"><i class="ph-duotone ph-wrench"></i> Taxas Operacionais</div>
@@ -235,3 +239,40 @@ function renderizarBusca() {
     divResultados.appendChild(card);
   });
 }
+
+// =========================================================
+// SISTEMA DE CÓPIA PARA WHATSAPP E TOAST NOTIFICATION
+// =========================================================
+function mostrarToast(mensagem) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<i class="ph-fill ph-check-circle"></i> ${mensagem}`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = 'fadeOut 0.3s ease forwards';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+document.addEventListener('click', function(evento) {
+  const botao = evento.target.closest('.copy-btn');
+  if (!botao) return; 
+
+  const cidade = botao.getAttribute('data-cidade');
+  const velocidade = botao.getAttribute('data-velocidade');
+  const servicos = botao.getAttribute('data-servicos');
+  const preco = botao.getAttribute('data-preco');
+
+  const textoParaCopiar = `📍 *${cidade}*\n🚀 *Plano:* ${velocidade}\n📦 *Serviços:* ${servicos}\n💰 *Valor:* ${preco}`;
+
+  navigator.clipboard.writeText(textoParaCopiar).then(() => {
+    mostrarToast('Plano copiado com sucesso!');
+  }).catch(erro => {
+    console.error('Falha ao copiar:', erro);
+    alert('Erro ao copiar. Verifique as permissões do navegador.');
+  });
+});
