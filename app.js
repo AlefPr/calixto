@@ -163,14 +163,26 @@ function renderizarBusca() {
     });
     // ===============================================================
 
-    // Renderiza Linhas
+   // Renderiza Linhas
     const linhasPlanosHtml = planosFiltrados.map(plano => {
       const badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
+      
+      // Ajuste visual do "Link Limpo"
+      const visualServicos = badgesServicos || '<span style="opacity: 0.4; font-size: 12px; font-style: italic;">Sem serviços adicionais</span>';
+      
+      // Cria o texto formatado que será copiado para a área de transferência
+      const textoCopia = `*Plano:* ${plano.velocidade}\n*Serviços:* ${plano.servicos.length > 0 ? plano.servicos.join(', ') : 'Nenhum'}\n*Valor:* ${plano.preco}`;
+
       return `
         <div class="plan-row">
           <div class="p-speed">${plano.velocidade}</div>
-          <div class="p-services">${badgesServicos || '<span class="service-tag tag-default" style="opacity: 0.6;">Link Limpo</span>'}</div>
-          <div class="p-price font-mono">${plano.preco}</div>
+          <div class="p-services">${visualServicos}</div>
+          <div class="price-wrapper">
+            <span class="p-price font-mono">${plano.preco}</span>
+            <button class="copy-btn" title="Copiar informações do plano" onclick="navigator.clipboard.writeText('${textoCopia}')">
+              <i class="ph-duotone ph-copy" style="font-size: 18px;"></i>
+            </button>
+          </div>
         </div>
       `;
     }).join('');
