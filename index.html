@@ -8,27 +8,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
   <style>
-    /* Paleta Premium Dark com Acentos Neon */
     :root {
-      --bg-app: #09090b;         /* Fundo ultra-escuro */
-      --bg-card: #131316;        /* Fundo do card levemente descolado */
-      --bg-kpi: #1c1c21;         /* Fundo das caixas de destaque */
-      --border-color: #27272a;   /* Cinza das divisões */
+      --bg-app: #09090b;
+      --bg-card: #131316;
+      --bg-kpi: #1c1c21;
+      --border-color: #27272a;
       --border-glow: rgba(255,255,255,0.06); 
-      
       --text-main: #f4f4f5;
       --text-muted: #a1a1aa;
-      
-      /* Cores de Destaque Tecnológico */
-      --accent-cyan: #06b6d4;    /* Internet Pura / Velocidade */
-      --accent-purple: #8b5cf6;  /* Deezer / Entretenimento */
-      --accent-blue: #3b82f6;    /* Max */
-      --accent-gold: #f59e0b;    /* Rotas / IP */
-      --accent-green: #10b981;   /* Status OK */
+      --accent-cyan: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --accent-blue: #3b82f6;
+      --accent-gold: #f59e0b;
+      --accent-green: #10b981;
     }
 
     body {
@@ -43,131 +38,64 @@
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
     .header-container { text-align: center; margin-bottom: 35px; }
-    .header-container h2 { 
-      display: flex; align-items: center; justify-content: center; gap: 10px; 
-      font-weight: 700; font-size: 1.6rem; margin-bottom: 25px;
-      letter-spacing: -0.5px;
-    }
-    
-    /* Ícone no título com cor de acento */
+    .header-container h2 { display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 1.6rem; margin-bottom: 25px; letter-spacing: -0.5px; }
     .header-container h2 i { color: var(--accent-cyan); }
 
-    /* Barra de Busca Premium */
     #busca-cidade {
-      width: 100%;
-      padding: 18px 24px;
-      font-size: 16px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      background-color: var(--bg-card);
-      color: var(--text-main);
-      outline: none;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-      transition: all 0.3s ease;
+      width: 100%; padding: 18px 24px; font-size: 16px; border-radius: 12px; border: 1px solid var(--border-color);
+      background-color: var(--bg-card); color: var(--text-main); outline: none; box-shadow: 0 8px 30px rgba(0,0,0,0.4); transition: all 0.3s ease;
     }
-    #busca-cidade:focus { 
-      border-color: var(--accent-cyan); 
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), 0 8px 30px rgba(0,0,0,0.5); 
-    }
+    #busca-cidade:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), 0 8px 30px rgba(0,0,0,0.5); }
 
-    /* Filtros (Toggles) com estilo de Dashboard */
-    .filter-container { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+    .filter-container { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
     .filter-btn {
       background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted);
       padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer;
       transition: all 0.2s; display: flex; align-items: center; gap: 8px;
     }
     .filter-btn:hover { background: var(--bg-kpi); border-color: #3f3f46; color: var(--text-main); }
-    .filter-btn.active { 
-      background: linear-gradient(180deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.05) 100%); 
-      border-color: var(--accent-cyan); color: var(--accent-cyan); 
-    }
+    .filter-btn.active { background: linear-gradient(180deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.05) 100%); border-color: var(--accent-cyan); color: var(--accent-cyan); }
 
-    /* Card Principal com Efeito de Flutuação */
-    .card {
-      border: 1px solid var(--border-glow); 
-      padding: 30px; border-radius: 16px; margin-bottom: 25px; 
-      background: var(--bg-card);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    }
-    
+    .card { border: 1px solid var(--border-glow); padding: 30px; border-radius: 16px; margin-bottom: 25px; background: var(--bg-card); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); }
     .card-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
     .card-header h3 { margin: 0 0 8px 0; font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
     .card-header h3 i { color: var(--accent-cyan); }
     
     .pop-badge { 
-      display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
-      background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 20px; 
-      color: var(--text-muted); letter-spacing: 0.5px; border: 1px solid var(--border-color);
+      display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.05); 
+      padding: 5px 12px; border-radius: 20px; color: var(--text-muted); letter-spacing: 0.5px; border: 1px solid var(--border-color);
     }
 
-    /* Cards de KPI com Top-Borders Coloridas */
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-    .kpi-box { 
-      background: var(--bg-kpi); padding: 16px; border-radius: 10px; 
-      border: 1px solid var(--border-color); border-top-width: 3px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
+    .kpi-box { background: var(--bg-kpi); padding: 16px; border-radius: 10px; border: 1px solid var(--border-color); border-top-width: 3px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     .kpi-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; letter-spacing: 0.5px; }
     .kpi-value { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
     
-    /* Animação do Ponto Verde Pulsante */
-    .pulse-dot {
-      height: 8px; width: 8px; background-color: var(--accent-green);
-      border-radius: 50%; display: inline-block;
-      box-shadow: 0 0 8px var(--accent-green);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 
-      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 
-      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 
-      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } 
-    }
+    .pulse-dot { height: 8px; width: 8px; background-color: var(--accent-green); border-radius: 50%; display: inline-block; box-shadow: 0 0 8px var(--accent-green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
-    /* Tabela de Planos Refinada */
-    .section-title { 
-      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; 
-      color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; 
-    }
-    
-    .table-container {
-      background: var(--bg-kpi); border: 1px solid var(--border-color); 
-      border-radius: 10px; margin-bottom: 30px; overflow: hidden;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-    }
+    .section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    .table-container { background: var(--bg-kpi); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 30px; overflow: hidden; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); }
 
-    .plan-row {
-      display: grid; grid-template-columns: 120px 1fr 120px; gap: 15px; align-items: center;
-      padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
-      border-left: 3px solid transparent; transition: all 0.2s ease;
-    }
-    .plan-row:hover { 
-      border-left-color: var(--accent-cyan); 
-      background: rgba(255,255,255,0.02); 
-    }
+    .plan-row { display: grid; grid-template-columns: 120px 1fr 120px; gap: 15px; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); border-left: 3px solid transparent; transition: all 0.2s ease; }
+    .plan-row:hover { border-left-color: var(--accent-cyan); background: rgba(255,255,255,0.02); }
     .plan-row:last-child { border-bottom: none; }
     
     .p-speed { font-weight: 700; font-size: 16px; color: var(--text-main); }
     .p-services { display: flex; flex-wrap: wrap; gap: 8px; }
     
-    /* Cores das Tags de Serviço */
     .service-tag { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
     .tag-default { background: rgba(255,255,255,0.05); color: #d4d4d8; border: 1px solid rgba(255,255,255,0.1); }
     .tag-deezer { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
     .tag-max { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
     .tag-sky { background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3); }
-    .tag-rota { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag-roteador { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .tag-corp { background: rgba(228, 228, 231, 0.1); color: #e4e4e7; border: 1px solid rgba(228, 228, 231, 0.2); }
     
-    /* Preço Tabular e Claro */
     .p-price { font-size: 15px; color: var(--text-main); text-align: right; }
 
-    /* Taxas */
     .tax-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-    .tax-tag {
-      background: var(--bg-kpi); border: 1px solid var(--border-color);
-      color: var(--text-muted); padding: 10px 16px; border-radius: 8px; font-size: 13px;
-      display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-    }
+    .tax-tag { background: var(--bg-kpi); border: 1px solid var(--border-color); color: var(--text-muted); padding: 10px 16px; border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
     .tax-tag:hover { border-color: #52525b; color: var(--text-main); }
     .tax-price { color: var(--text-main); font-weight: 600; margin-left: 6px; }
     .tax-icon { color: var(--accent-gold); }
@@ -183,6 +111,7 @@
       <button class="filter-btn active" data-filter="todos"><i class="ph-duotone ph-squares-four"></i> Todos os Planos</button>
       <button class="filter-btn" data-filter="internet"><i class="ph-duotone ph-wifi-high"></i> Apenas Internet</button>
       <button class="filter-btn" data-filter="combo"><i class="ph-duotone ph-monitor-play"></i> Combos VIP</button>
+      <button class="filter-btn" data-filter="corp"><i class="ph-duotone ph-buildings"></i> Corporativo</button>
     </div>
   </div>
 
