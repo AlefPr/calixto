@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NOC | Consulta de Cobertura</title>
   
-  <!-- Fontes Corporativas e Tabulares -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
-  <!-- Ícones Profissionais -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
   <style>
@@ -51,7 +49,6 @@
     }
     .header-container h2 i { color: var(--accent-cyan); }
 
-    /* Barra de Busca Premium */
     #busca-cidade {
       width: 100%; padding: 18px 24px; font-size: 16px; border-radius: 12px; 
       border: 1px solid var(--border-color); background-color: var(--bg-card); 
@@ -63,7 +60,6 @@
       box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), 0 8px 30px rgba(0,0,0,0.5); 
     }
 
-    /* Filtros (Toggles) */
     .filter-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px; }
     .filter-btn {
       background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted);
@@ -76,7 +72,6 @@
       border-color: var(--accent-cyan); color: var(--accent-cyan); 
     }
 
-    /* Card Principal */
     .card {
       border: 1px solid var(--border-glow); padding: 30px; border-radius: 16px; 
       margin-bottom: 25px; background: var(--bg-card); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -92,7 +87,6 @@
       color: var(--text-muted); letter-spacing: 0.5px; border: 1px solid var(--border-color);
     }
 
-    /* Cards de KPI */
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
     .kpi-box { 
       background: var(--bg-kpi); padding: 16px; border-radius: 10px; 
@@ -102,7 +96,6 @@
     .kpi-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; letter-spacing: 0.5px; }
     .kpi-value { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
     
-    /* Ponto Verde Pulsante */
     .pulse-dot {
       height: 8px; width: 8px; background-color: var(--accent-green); border-radius: 50%; 
       display: inline-block; box-shadow: 0 0 8px var(--accent-green); animation: pulse 2s infinite;
@@ -113,7 +106,6 @@
       100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } 
     }
 
-    /* Tabela de Planos */
     .section-title { 
       font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; 
       color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; 
@@ -137,7 +129,6 @@
       padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
       border-left: 3px solid transparent; transition: all 0.2s ease;
     }
-    /* Efeito Zebrado e Hover */
     .plan-row:nth-child(even) { background-color: rgba(255, 255, 255, 0.015); }
     .plan-row:hover { border-left-color: var(--accent-cyan); background: rgba(255,255,255,0.03); }
     .plan-row:last-child { border-bottom: none; }
@@ -145,11 +136,9 @@
     .p-speed { font-weight: 700; font-size: 16px; color: var(--text-main); }
     .p-services { display: flex; flex-wrap: wrap; gap: 8px; }
     
-    /* Layout do Preço + Botão */
     .price-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
     .p-price { font-size: 15px; color: var(--text-main); text-align: right; }
 
-    /* Botão de Copiar */
     .copy-btn {
       background: transparent; border: none; color: var(--text-muted);
       cursor: pointer; padding: 4px; border-radius: 4px;
@@ -159,7 +148,6 @@
     .copy-btn:hover { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1); }
     .copy-btn:active { transform: scale(0.9); }
     
-    /* Cores das Tags de Serviço */
     .service-tag { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
     .tag-default { background: rgba(255,255,255,0.05); color: #d4d4d8; border: 1px solid rgba(255,255,255,0.1); }
     .tag-deezer { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
@@ -168,7 +156,6 @@
     .tag-roteador { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
     .tag-corp { background: rgba(148, 163, 184, 0.1); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
 
-    /* Taxas */
     .tax-grid { display: flex; flex-wrap: wrap; gap: 12px; }
     .tax-tag {
       background: var(--bg-kpi); border: 1px solid var(--border-color); color: var(--text-muted); 
@@ -178,7 +165,19 @@
     .tax-price { color: var(--text-main); font-weight: 600; margin-left: 6px; }
     .tax-icon { color: var(--accent-gold); }
 
-    /* Toast Notification (Aviso Flutuante) */
+    /* =========================================
+       DESTAQUE NEON (Descontos)
+       ========================================= */
+    .tax-discount {
+      background: rgba(16, 185, 129, 0.08) !important;
+      border: 1px solid rgba(16, 185, 129, 0.5) !important;
+      color: var(--accent-green) !important;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+      font-weight: 600;
+    }
+    .tax-discount .tax-icon { color: var(--accent-green); }
+    .tax-discount .tax-price { color: var(--accent-green); }
+
     #toast-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
     .toast {
       background: var(--bg-card); border: 1px solid var(--accent-green); color: var(--text-main); 
@@ -188,6 +187,19 @@
     .toast i { color: var(--accent-green); font-size: 18px; }
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+    /* Assinatura no canto inferior */
+    .watermark {
+      position: fixed;
+      bottom: 15px;
+      left: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 1000;
+    }
 
   </style>
 </head>
@@ -207,8 +219,9 @@
 
   <div id="resultados"></div>
   
-  <!-- Container para os avisos na tela (Toast) -->
   <div id="toast-container"></div>
+  
+  <div class="watermark">by:alef</div>
 
   <script src="app.js"></script>
 </body>
