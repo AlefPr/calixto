@@ -52,7 +52,6 @@ function formatarNomeServico(nome) {
   return n.charAt(0).toUpperCase() + n.slice(1);
 }
 
-// Retorna a classe CSS correta para colorir a tag
 function obterClasseTag(servico) {
   let s = servico.toLowerCase();
   if(s.includes('deezer')) return 'tag-deezer';
@@ -68,7 +67,6 @@ function interpretarPlano(textoPlano) {
   let precoLimpo = 'Consulte';
   let descricao = textoPlano.trim();
 
-  // Extrai o valor em Reais
   const regexPreco = /[-–\s]*R\$\s*([\d.,]+)/i;
   const matchPreco = descricao.match(regexPreco);
 
@@ -81,7 +79,6 @@ function interpretarPlano(textoPlano) {
   let servicosFormatados = [];
   let categoria = 'internet';
 
-  // Lógica Especial para Planos Empresariais (SCM)
   if (descricao.toLowerCase().includes('scm') || descricao.toLowerCase().includes('corp')) {
     const matchVelocidade = descricao.match(/^(\d+\s*(?:Mbps|Gbps))/i);
     if (matchVelocidade) {
@@ -89,9 +86,7 @@ function interpretarPlano(textoPlano) {
     }
     servicosFormatados = ["Conexão Multimídia SCM (Empresarial)"];
     categoria = 'corp';
-  } 
-  // Lógica para Planos Residenciais
-  else {
+  } else {
     const itensRaw = descricao.split('+').map(i => i.trim()).filter(i => i !== "");
     velocidade = itensRaw.shift() || "N/A";
     velocidade = velocidade.replace("Gbps Mbps", "Gbps").replace(/ /g, '');
@@ -136,7 +131,7 @@ function renderizarBusca() {
     const planosProcessados = planosUnicos.map(interpretarPlano);
     const planosFiltrados = planosProcessados.filter(p => filtroAtivo === 'todos' || p.categoria === filtroAtivo);
 
-    // === LÓGICA DE ORDENAÇÃO (Sorting) ===
+    // Sorting Lógico
     planosFiltrados.sort((a, b) => {
       const getSpeed = (str) => {
         if (!str || str === "N/A") return 0;
@@ -153,13 +148,11 @@ function renderizarBusca() {
       const speedA = getSpeed(a.velocidade);
       const speedB = getSpeed(b.velocidade);
 
-      // Desempata primeiro pela velocidade (menor para maior)
       if (speedA !== speedB) return speedA - speedB;
-      // Depois pelo preço (menor para maior)
       return getPrice(a.preco) - getPrice(b.preco);
     });
 
-    // === RENDERIZAÇÃO DAS LINHAS ===
+    // Renderização das Linhas
     const linhasPlanosHtml = planosFiltrados.map(plano => {
       const badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
       const visualServicos = badgesServicos || '<span style="opacity: 0.4; font-size: 12px; font-style: italic;">Sem serviços adicionais</span>';
@@ -183,7 +176,7 @@ function renderizarBusca() {
       `;
     }).join('');
 
-    // === RENDERIZAÇÃO DAS TAXAS ===
+    // RENDERIZAÇÃO DAS TAXAS COM NEON VERDE
     const taxasHtml = taxasUnicas.map(taxa => {
       let displayValor = '';
       if (taxa.valor !== '') {
@@ -193,10 +186,20 @@ function renderizarBusca() {
           displayValor = `<span class="tax-price font-mono">- R$ ${Number(taxa.valor).toFixed(2).replace('.', ',')}</span>`;
         }
       }
-      return `<div class="tax-tag"><i class="ph-duotone ph-receipt tax-icon"></i> ${taxa.nome} ${displayValor}</div>`;
+
+      // Inteligência do Neon: Caça a palavra "DESCONTO" e adiciona as classes Premium
+      let classeExtra = '';
+      let icone = 'ph-receipt'; 
+      
+      if (taxa.nome.toUpperCase().includes('DESCONTO')) {
+        classeExtra = 'tax-discount';
+        icone = 'ph-ticket'; // Ícone de Etiqueta/Ticket promocional
+      }
+
+      return `<div class="tax-tag ${classeExtra}"><i class="ph-duotone ${icone} tax-icon"></i> ${taxa.nome} ${displayValor}</div>`;
     }).join('');
 
-    // === MONTAGEM DO CARD FINAL ===
+    // Montagem do Card HTML
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -232,7 +235,7 @@ function renderizarBusca() {
         ` : '<div style="padding: 20px; color: var(--text-muted); text-align: center; font-size: 14px;">Nenhum plano corresponde ao filtro selecionado.</div>'}
       </div>
 
-      <div class="section-title"><i class="ph-duotone ph-wrench"></i> Taxas Operacionais</div>
+      <div class="section-title"><i class="ph-duotone ph-wrench"></i> Taxas e Descontos</div>
       <div class="tax-grid">${taxasHtml || '<span style="color: var(--text-muted); font-size: 14px; padding-left: 5px;">Nenhuma taxa cadastrada.</span>'}</div>
     `;
     
@@ -276,4 +279,3 @@ document.addEventListener('click', function(evento) {
     alert('Erro ao copiar. Verifique as permissões do navegador.');
   });
 });
-
