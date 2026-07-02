@@ -166,16 +166,16 @@
     .tax-icon { color: var(--accent-gold); }
 
     /* =========================================
-       DESTAQUE NEON (Descontos)
+       DESTAQUE NEON EXTREMO (Descontos)
        ========================================= */
     .tax-discount {
-      background: rgba(16, 185, 129, 0.08) !important;
-      border: 1px solid rgba(16, 185, 129, 0.5) !important;
-      color: var(--accent-green) !important;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
-      font-weight: 600;
+      background: rgba(16, 185, 129, 0.1) !important;
+      border: 2px solid var(--accent-green) !important; /* Borda mais grossa */
+      color: #fff !important; /* Texto branco pra destacar bem */
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4), inset 0 0 10px rgba(16, 185, 129, 0.2);
+      font-weight: 700;
     }
-    .tax-discount .tax-icon { color: var(--accent-green); }
+    .tax-discount .tax-icon { color: var(--accent-green); text-shadow: 0 0 8px var(--accent-green); }
     .tax-discount .tax-price { color: var(--accent-green); }
 
     #toast-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
@@ -188,7 +188,9 @@
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
 
-    /* Assinatura no canto inferior */
+    /* =========================================
+       ASSINATURA BY: ALEF
+       ========================================= */
     .watermark {
       position: fixed;
       bottom: 15px;
@@ -196,9 +198,10 @@
       font-size: 13px;
       color: var(--text-muted);
       font-family: 'JetBrains Mono', monospace;
-      opacity: 0.3;
+      opacity: 0.4;
       pointer-events: none;
       z-index: 1000;
+      letter-spacing: 1px;
     }
 
   </style>
