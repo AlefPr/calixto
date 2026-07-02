@@ -80,6 +80,17 @@
     .plan-row { display: grid; grid-template-columns: 120px 1fr 120px; gap: 15px; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); border-left: 3px solid transparent; transition: all 0.2s ease; }
     .plan-row:hover { border-left-color: var(--accent-cyan); background: rgba(255,255,255,0.02); }
     .plan-row:last-child { border-bottom: none; }
+    .plan-row { 
+      display: grid; grid-template-columns: 120px 1fr 120px; gap: 15px; align-items: center; 
+      padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
+      border-left: 3px solid transparent; transition: all 0.2s ease; 
+    }
+    
+    /* NOVA REGRA: Efeito Zebrado para facilitar leitura de listas longas */
+    .plan-row:nth-child(even) { background-color: rgba(255, 255, 255, 0.015); }
+    
+    .plan-row:hover { border-left-color: var(--accent-cyan); background: rgba(255,255,255,0.03); }
+    .plan-row:last-child { border-bottom: none; }
     
     .p-speed { font-weight: 700; font-size: 16px; color: var(--text-main); }
     .p-services { display: flex; flex-wrap: wrap; gap: 8px; }
