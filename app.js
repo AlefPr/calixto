@@ -276,3 +276,4 @@ document.addEventListener('click', function(evento) {
     alert('Erro ao copiar. Verifique as permissões do navegador.');
   });
 });
+
