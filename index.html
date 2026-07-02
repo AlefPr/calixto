@@ -102,6 +102,22 @@
     .tag-sky { background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3); }
     .tag-roteador { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
     .tag-corp { background: rgba(228, 228, 231, 0.1); color: #e4e4e7; border: 1px solid rgba(228, 228, 231, 0.2); }
+
+    /* Ajuste da Tag Corporativa para um tom Platina Premium */
+    .tag-corp { background: rgba(148, 163, 184, 0.1); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
+
+    /* Estilo do Botão de Copiar */
+    .copy-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      cursor: pointer; padding: 4px; border-radius: 4px;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.2s; margin-left: 10px;
+    }
+    .copy-btn:hover { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.1); }
+    .copy-btn:active { transform: scale(0.9); }
+    
+    /* Layout da coluna de preço para alinhar o botão */
+    .price-wrapper { display: flex; align-items: center; justify-content: flex-end; }
     
     .p-price { font-size: 15px; color: var(--text-main); text-align: right; }
 
