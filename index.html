@@ -14,6 +14,9 @@
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
   <style>
+    /* Reset e Box-Sizing (Garante o Alinhamento Perfeito do Grid) */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     /* Paleta Premium ISP */
     :root {
       --bg-app: #09090b;         
@@ -34,11 +37,22 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      padding: 40px 20px;
-      max-width: 950px;
-      margin: 0 auto;
+      /* Fundo Tático NOC: Grid topográfico sutil em Cyan (3% opacidade) */
       background-color: var(--bg-app);
+      background-image: 
+        linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+      background-position: center top;
       color: var(--text-main);
+      padding: 40px 20px;
+    }
+
+    /* Container Centralizador */
+    .main-container {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
     }
 
     .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -51,7 +65,7 @@
     }
     .header-container h2 i { color: var(--accent-cyan); }
 
-    /* Barra de Busca */
+    /* Barra de Busca (Agora perfeitamente alinhada com a Box) */
     #busca-cidade {
       width: 100%; padding: 18px 24px; font-size: 16px; border-radius: 12px; 
       border: 1px solid var(--border-color); background-color: var(--bg-card); 
@@ -73,7 +87,7 @@
       border-color: var(--accent-cyan); color: var(--accent-cyan); 
     }
 
-    /* Container Principal */
+    /* Card Principal */
     .card {
       border: 1px solid var(--border-glow); padding: 30px; border-radius: 16px; 
       margin-bottom: 25px; background: var(--bg-card); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -89,7 +103,7 @@
       color: var(--text-muted); letter-spacing: 0.5px; border: 1px solid var(--border-color);
     }
 
-    /* KPIs com Gradiente de Profundidade */
+    /* KPIs */
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
     .kpi-box { 
       padding: 16px; border-radius: 10px; border: 1px solid var(--border-color); border-top-width: 3px; 
@@ -118,7 +132,7 @@
     .table-header {
       display: grid; grid-template-columns: 120px 1fr 140px; gap: 15px;
       padding: 12px 20px; font-size: 10px; text-transform: uppercase;
-      letter-spacing: 1px; color: #71717a; font-weight: 700;
+      letter-spacing: 1px; color: var(--text-muted); font-weight: 700; /* Contraste Corrigido */
       border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.3);
     }
     .plan-row {
@@ -144,7 +158,7 @@
       .copy-btn { opacity: 0; transform: translateX(-5px); }
       .plan-row:hover .copy-btn { opacity: 1; transform: translateX(0); background: rgba(255,255,255,0.05); }
     }
-    .copy-btn:hover { color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15) !important; }
+    .copy-btn:hover { color: var(--accent-cyan) !important; background: rgba(6, 182, 212, 0.15) !important; }
     .copy-btn:active { transform: scale(0.9) !important; }
     
     /* Tags de Serviços */
@@ -153,7 +167,6 @@
     .tag-max { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
     .tag-sky { background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3); }
     .tag-roteador { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .tag-corp { background: rgba(148, 163, 184, 0.1); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
 
     /* Tags Padrão (Taxas) */
     .tax-grid { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -176,7 +189,9 @@
     }
     .promo-icon i { font-size: 24px; color: var(--accent-green); }
     .promo-content { display: flex; flex-direction: column; justify-content: center; }
-    .promo-title { font-size: 13px; font-weight: 700; color: var(--accent-green); letter-spacing: 0.5px; }
+    
+    /* Tipografia Corrigida para Campanhas (Sai o CAPS LOCK) */
+    .promo-title { font-size: 13px; font-weight: 700; color: var(--accent-green); letter-spacing: 0.5px; text-transform: capitalize; }
     .promo-value { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-style: italic; }
 
     /* Toast Notification (Feedback) */
@@ -190,26 +205,33 @@
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
 
-    /* Assinatura */
-    .watermark { position: fixed; bottom: 15px; left: 20px; font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; opacity: 0.3; pointer-events: none; z-index: 1000; letter-spacing: 1px; }
+    /* Assinatura Otimizada */
+    .watermark { 
+      position: fixed; bottom: 15px; left: 20px; font-size: 12px; color: var(--text-muted); 
+      font-family: 'JetBrains Mono', monospace; opacity: 0.5; pointer-events: none; 
+      z-index: 1000; letter-spacing: 1px; 
+    }
 
   </style>
 </head>
 <body>
 
-  <div class="header-container">
-    <h2><i class="ph-duotone ph-hard-drives"></i> NOC | Cobertura Comercial</h2>
-    <input type="text" id="busca-cidade" placeholder="Digite a cidade ou região (ex: Palmas)..." autocomplete="off">
-    
-    <div class="filter-container">
-      <button class="filter-btn active" data-filter="todos"><i class="ph-duotone ph-squares-four"></i> Todos os Planos</button>
-      <button class="filter-btn" data-filter="internet"><i class="ph-duotone ph-wifi-high"></i> Apenas Internet</button>
-      <button class="filter-btn" data-filter="combo"><i class="ph-duotone ph-monitor-play"></i> Combos VIP</button>
-      <button class="filter-btn" data-filter="corp"><i class="ph-duotone ph-buildings"></i> Empresarial</button>
+  <div class="main-container">
+    <div class="header-container">
+      <h2><i class="ph-duotone ph-hard-drives"></i> NOC | Cobertura Comercial</h2>
+      <input type="text" id="busca-cidade" placeholder="Digite a cidade ou região (ex: Palmas)..." autocomplete="off">
+      
+      <div class="filter-container">
+        <button class="filter-btn active" data-filter="todos"><i class="ph-duotone ph-squares-four"></i> Todos os Planos</button>
+        <button class="filter-btn" data-filter="internet"><i class="ph-duotone ph-wifi-high"></i> Apenas Internet</button>
+        <button class="filter-btn" data-filter="combo"><i class="ph-duotone ph-monitor-play"></i> Combos VIP</button>
+        <button class="filter-btn" data-filter="corp"><i class="ph-duotone ph-buildings"></i> Empresarial</button>
+      </div>
     </div>
-  </div>
 
-  <div id="resultados"></div>
+    <div id="resultados"></div>
+  </div>
+  
   <div id="toast-container"></div>
   <div class="watermark">by:alef</div>
 
