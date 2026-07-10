@@ -6,7 +6,7 @@ let bancosDeDadosCidades = {};
 let filtroAtivo = 'todos'; 
 
 // 1. Loader de Dados
-fetch('./cidades.json')
+fetch('./cidades.json') // Confirme sempre o nome do seu arquivo JSON aqui!
   .then(response => response.json())
   .then(data => {
     let cidadeAtual = "";
@@ -58,7 +58,6 @@ function obterClasseTag(servico) {
   if(s.includes('max')) return 'tag-max';
   if(s.includes('sky')) return 'tag-sky';
   if(s.includes('roteador')) return 'tag-roteador';
-  if(s.includes('scm') || s.includes('empresarial')) return 'tag-corp';
   return 'tag-default';
 }
 
@@ -165,16 +164,29 @@ function renderizarBusca() {
       return getPrice(a.preco) - getPrice(b.preco);
     });
 
-    // Renderização das Linhas da Tabela (Com o Travessão Minimalista)
+    // Renderização das Linhas da Tabela (Com Lógica de Limpeza Visual para Planos Corp)
     const linhasPlanosHtml = planosFiltrados.map(plano => {
-      const badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
+      let badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
+      let visualServicos = badgesServicos || '<span style="color: #52525b; font-weight: 700; letter-spacing: 2px;">—</span>';
+      let visualVelocidade = plano.velocidade;
+
+      // Se for corporativo, não renderiza a tag gigante. Joga um subtítulo elegante abaixo da velocidade.
+      if (plano.categoria === 'corp') {
+        visualServicos = '<span style="color: #52525b; font-weight: 700; letter-spacing: 2px;">—</span>';
+        visualVelocidade = `
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span>${plano.velocidade}</span>
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 500; font-family: 'Inter', sans-serif;">Plano Empresarial (SCM)</span>
+          </div>
+        `;
+      }
       
-      // Ajuste de UX: Se não tiver serviço extra, exibe apenas um traço elegante
-      const visualServicos = badgesServicos || '<span style="color: #52525b; font-weight: 700; letter-spacing: 2px;">—</span>';
-      
+      // Lógica segura para copiar informações
+      let infoServicosCopia = plano.servicos.length > 0 && plano.categoria !== 'corp' ? plano.servicos.join(', ') : (plano.categoria === 'corp' ? 'Link Dedicado SCM' : 'Nenhum');
+
       return `
         <div class="plan-row">
-          <div class="p-speed">${plano.velocidade}</div>
+          <div class="p-speed">${visualVelocidade}</div>
           <div class="p-services">${visualServicos}</div>
           <div class="price-wrapper">
             <span class="p-price font-mono">${plano.preco}</span>
@@ -182,7 +194,7 @@ function renderizarBusca() {
                     title="Copiar para WhatsApp"
                     data-cidade="${dados.cidade}"
                     data-velocidade="${plano.velocidade}"
-                    data-servicos="${plano.servicos.length > 0 ? plano.servicos.join(', ') : 'Nenhum'}"
+                    data-servicos="${infoServicosCopia}"
                     data-preco="${plano.preco}">
               <i class="ph-duotone ph-copy" style="font-size: 20px;"></i>
             </button>
@@ -201,7 +213,7 @@ function renderizarBusca() {
             <div class="promo-banner">
               <div class="promo-icon"><i class="ph-duotone ph-ticket"></i></div>
               <div class="promo-content">
-                <span class="promo-title">${p.nome}</span>
+                <span class="promo-title">${p.nome.toLowerCase()}</span>
                 ${p.valor ? `<span class="promo-value">Condição Especial: ${p.valor}</span>` : '<span class="promo-value">Aproveite essa condição no momento do fechamento.</span>'}
               </div>
             </div>
@@ -223,7 +235,7 @@ function renderizarBusca() {
       return `<div class="tax-tag"><i class="ph-duotone ph-receipt tax-icon"></i> ${taxa.nome} ${displayValor}</div>`;
     }).join('');
 
-    // Renderiza o Card Principal (Adicionado gradiente inline nas boxes de KPI)
+    // Renderiza o Card Principal
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
