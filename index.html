@@ -1,240 +1,269 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NOC | Cobertura Comercial</title>
-  
-  <!-- Fontes Corporativas -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  
-  <!-- Ícones -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  
-  <style>
-    /* Reset e Box-Sizing (Garante o Alinhamento Perfeito do Grid) */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promoções - Internet Fibra</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #f39c12;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --card-bg: #ffffff;
+        }
 
-    /* Paleta Premium ISP */
-    :root {
-      --bg-app: #09090b;         
-      --bg-card: #131316;        
-      --bg-kpi: #1c1c21;         
-      --border-color: #27272a;   
-      --border-glow: rgba(255,255,255,0.06); 
-      
-      --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
-      
-      --accent-cyan: #06b6d4;    
-      --accent-purple: #8b5cf6;  
-      --accent-blue: #3b82f6;    
-      --accent-gold: #f59e0b;    
-      --accent-green: #10b981;   
-    }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      /* Fundo Tático NOC: Grid topográfico sutil em Cyan (3% opacidade) */
-      background-color: var(--bg-app);
-      background-image: 
-        linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
-      background-size: 30px 30px;
-      background-position: center top;
-      color: var(--text-main);
-      padding: 40px 20px;
-    }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
 
-    /* Container Centralizador */
-    .main-container {
-      max-width: 900px;
-      margin: 0 auto;
-      position: relative;
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
 
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
 
-    .header-container { text-align: center; margin-bottom: 35px; }
-    .header-container h2 { 
-      display: flex; align-items: center; justify-content: center; gap: 10px; 
-      font-weight: 700; font-size: 1.6rem; margin-bottom: 25px;
-      letter-spacing: -0.5px;
-    }
-    .header-container h2 i { color: var(--accent-cyan); }
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+        }
 
-    /* Barra de Busca (Agora perfeitamente alinhada com a Box) */
-    #busca-cidade {
-      width: 100%; padding: 18px 24px; font-size: 16px; border-radius: 12px; 
-      border: 1px solid var(--border-color); background-color: var(--bg-card); 
-      color: var(--text-main); outline: none; box-shadow: 0 8px 30px rgba(0,0,0,0.4); 
-      transition: all 0.3s ease;
-    }
-    #busca-cidade:focus { border-color: var(--accent-cyan); box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), 0 8px 30px rgba(0,0,0,0.5); }
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 50px;
+            justify-content: center;
+        }
 
-    /* Filtros Rápidos */
-    .filter-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px; }
-    .filter-btn {
-      background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted);
-      padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer;
-      transition: all 0.2s; display: flex; align-items: center; gap: 8px;
-    }
-    .filter-btn:hover { background: var(--bg-kpi); border-color: #3f3f46; color: var(--text-main); }
-    .filter-btn.active { 
-      background: linear-gradient(180deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.05) 100%); 
-      border-color: var(--accent-cyan); color: var(--accent-cyan); 
-    }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            flex: 1;
+            min-width: 300px;
+            max-width: 450px;
+            position: relative;
+            border-top: 5px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
 
-    /* Card Principal */
-    .card {
-      border: 1px solid var(--border-glow); padding: 30px; border-radius: 16px; 
-      margin-bottom: 25px; background: var(--bg-card); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    }
-    
-    .card-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
-    .card-header h3 { margin: 0 0 8px 0; font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
-    .card-header h3 i { color: var(--accent-cyan); }
-    
-    .pop-badge { 
-      display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
-      background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 20px; 
-      color: var(--text-muted); letter-spacing: 0.5px; border: 1px solid var(--border-color);
-    }
+        .card:hover {
+            transform: translateY(-5px);
+        }
 
-    /* KPIs */
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-    .kpi-box { 
-      padding: 16px; border-radius: 10px; border: 1px solid var(--border-color); border-top-width: 3px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative; overflow: hidden;
-    }
-    .kpi-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; letter-spacing: 0.5px; position: relative; z-index: 2; }
-    .kpi-value { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-main); position: relative; z-index: 2; }
-    
-    .pulse-dot {
-      height: 8px; width: 8px; background-color: var(--accent-green); border-radius: 50%; 
-      display: inline-block; box-shadow: 0 0 8px var(--accent-green); animation: pulse 2s infinite;
-    }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        .card-destaque {
+            border-top: 5px solid var(--secondary-color);
+        }
 
-    /* Títulos de Seção */
-    .section-title { 
-      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; 
-      color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; 
-    }
-    
-    /* Tabela Otimizada */
-    .table-container {
-      background: var(--bg-kpi); border: 1px solid var(--border-color); 
-      border-radius: 10px; margin-bottom: 30px; overflow: hidden; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-    }
-    .table-header {
-      display: grid; grid-template-columns: 120px 1fr 140px; gap: 15px;
-      padding: 12px 20px; font-size: 10px; text-transform: uppercase;
-      letter-spacing: 1px; color: var(--text-muted); font-weight: 700; /* Contraste Corrigido */
-      border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.3);
-    }
-    .plan-row {
-      display: grid; grid-template-columns: 120px 1fr 140px; gap: 15px; align-items: center;
-      padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
-      border-left: 3px solid transparent; transition: all 0.2s ease;
-    }
-    .plan-row:nth-child(even) { background-color: rgba(255, 255, 255, 0.015); }
-    .plan-row:hover { border-left-color: var(--accent-cyan); background: rgba(255,255,255,0.03); }
-    .plan-row:last-child { border-bottom: none; }
-    
-    .p-speed { font-weight: 700; font-size: 16px; color: var(--text-main); }
-    .p-services { display: flex; flex-wrap: wrap; gap: 8px; }
-    .price-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
-    .p-price { font-size: 15px; color: var(--text-main); text-align: right; }
+        .badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            position: absolute;
+            top: -15px;
+            left: 30px;
+        }
 
-    /* Botão de Copiar Oculto (Aparece no Hover da Linha) */
-    .copy-btn {
-      background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; 
-      border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;
-    }
-    @media (hover: hover) {
-      .copy-btn { opacity: 0; transform: translateX(-5px); }
-      .plan-row:hover .copy-btn { opacity: 1; transform: translateX(0); background: rgba(255,255,255,0.05); }
-    }
-    .copy-btn:hover { color: var(--accent-cyan) !important; background: rgba(6, 182, 212, 0.15) !important; }
-    .copy-btn:active { transform: scale(0.9) !important; }
-    
-    /* Tags de Serviços */
-    .service-tag { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
-    .tag-deezer { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
-    .tag-max { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
-    .tag-sky { background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3); }
-    .tag-roteador { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge.destaque {
+            background-color: var(--secondary-color);
+        }
 
-    /* Tags Padrão (Taxas) */
-    .tax-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-    .tax-tag {
-      background: var(--bg-kpi); border: 1px solid var(--border-color); color: var(--text-muted); 
-      padding: 10px 16px; border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: all 0.2s;
-    }
-    .tax-tag:hover { border-color: #52525b; color: var(--text-main); }
-    .tax-price { color: var(--text-main); font-weight: 600; margin-left: 6px; }
-    .tax-icon { color: var(--accent-gold); }
+        .card h2 {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
 
-    /* Banners Promocionais Elegantes */
-    .promo-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-    .promo-banner {
-      display: flex; align-items: center; gap: 15px; padding: 14px 20px;
-      background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.01) 100%);
-      border: 1px solid rgba(16, 185, 129, 0.15);
-      border-left: 4px solid var(--accent-green);
-      border-radius: 8px;
-    }
-    .promo-icon i { font-size: 24px; color: var(--accent-green); }
-    .promo-content { display: flex; flex-direction: column; justify-content: center; }
-    
-    /* Tipografia Corrigida para Campanhas (Sai o CAPS LOCK) */
-    .promo-title { font-size: 13px; font-weight: 700; color: var(--accent-green); letter-spacing: 0.5px; text-transform: capitalize; }
-    .promo-value { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-style: italic; }
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: baseline;
+        }
 
-    /* Toast Notification (Feedback) */
-    #toast-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
-    .toast {
-      background: var(--bg-card); border: 1px solid var(--accent-green); color: var(--text-main); 
-      padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideIn 0.3s ease forwards;
-    }
-    .toast i { color: var(--accent-green); font-size: 18px; }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+        .card-destaque .price {
+            color: var(--secondary-color);
+        }
 
-    /* Assinatura Otimizada */
-    .watermark { 
-      position: fixed; bottom: 15px; left: 20px; font-size: 12px; color: var(--text-muted); 
-      font-family: 'JetBrains Mono', monospace; opacity: 0.5; pointer-events: none; 
-      z-index: 1000; letter-spacing: 1px; 
-    }
+        .currency {
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
 
-  </style>
+        .cents {
+            font-size: 1.5rem;
+        }
+
+        .period {
+            font-size: 1rem;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        .features li:last-child {
+            border-bottom: none;
+        }
+
+        .table-container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        .table-container h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="main-container">
-    <div class="header-container">
-      <h2><i class="ph-duotone ph-hard-drives"></i> NOC | Cobertura Comercial</h2>
-      <input type="text" id="busca-cidade" placeholder="Digite a cidade ou região (ex: Palmas)..." autocomplete="off">
-      
-      <div class="filter-container">
-        <button class="filter-btn active" data-filter="todos"><i class="ph-duotone ph-squares-four"></i> Todos os Planos</button>
-        <button class="filter-btn" data-filter="internet"><i class="ph-duotone ph-wifi-high"></i> Apenas Internet</button>
-        <button class="filter-btn" data-filter="combo"><i class="ph-duotone ph-monitor-play"></i> Combos VIP</button>
-        <button class="filter-btn" data-filter="corp"><i class="ph-duotone ph-buildings"></i> Empresarial</button>
-      </div>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <header class="header">
+            <h1>Sua Internet Fibra com as Melhores Condições</h1>
+            <p>Confira nossas ofertas exclusivas e garanta a melhor conexão para sua casa.</p>
+        </header>
+
+        <!-- Seção de Cards -->
+        <div class="cards-container">
+            
+            <!-- Card 1: 700 Mbps -->
+            <div class="card card-destaque">
+                <div class="badge destaque">Oferta de Adesão</div>
+                <h2>Plano 700 Mbps</h2>
+                <div class="price">
+                    <span class="currency">R$</span>49<span class="cents">,99</span><span class="period">/mês*</span>
+                </div>
+                <ul class="features">
+                    <li>✔️ <strong>Valor nos 3 primeiros meses</strong> para pagamentos até o vencimento.</li>
+                    <li>✔️ <strong>Valor regular:</strong> R$ 109,99/mês a partir do 4º mês.</li>
+                    <li>✔️ <strong>Cidades elegíveis:</strong> Augustinópolis, Axixá do TO, Sampaio, Sítio Novo do TO e Praia Norte.</li>
+                </ul>
+            </div>
+
+            <!-- Card 2: Desconto de Pontualidade -->
+            <div class="card">
+                <div class="badge">Benefício Fixo</div>
+                <h2>Desconto de Pontualidade</h2>
+                <div class="price">
+                    <span class="currency">R$</span>10<span class="cents">,00</span><span class="period"> OFF</span>
+                </div>
+                <ul class="features">
+                    <li>✔️ <strong>Desconto todo mês</strong> automático pagando até o dia do vencimento.</li>
+                    <li>✔️ <strong>Planos contemplados:</strong> 600 Mbps e 800 Mbps.</li>
+                    <li>✔️ <strong>Cobertura:</strong> Palmas, Porto Nacional, Araguacema, Colméia, Conceição do Araguaia e outras.</li>
+                    <li>✔️ <strong>Regra Guaraí:</strong> Válido exclusivamente para o plano de 800 Mbps.</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Seção da Tabela -->
+        <div class="table-container">
+            <h3>Resumo de Planos e Cidades</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plano</th>
+                        <th>Oferta Principal</th>
+                        <th>Benefício de Pontualidade</th>
+                        <th>Cidades Atendidas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>700 Mbps</strong></td>
+                        <td>R$ 49,99 (1º ao 3º mês)</td>
+                        <td>Incluído no valor promocional</td>
+                        <td>Augustinópolis, Axixá do TO, Sampaio, Sítio Novo do TO, Praia Norte</td>
+                    </tr>
+                    <tr>
+                        <td><strong>600 Mbps</strong></td>
+                        <td>Preço regular</td>
+                        <td>R$ 10,00 OFF no vencimento</td>
+                        <td>Palmas, Porto Nacional, Araguacema, Colméia, Conceição do Araguaia, etc.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>800 Mbps</strong></td>
+                        <td>Preço regular</td>
+                        <td>R$ 10,00 OFF no vencimento</td>
+                        <td>Palmas, Porto Nacional, Guaraí e demais cidades</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div id="resultados"></div>
-  </div>
-  
-  <div id="toast-container"></div>
-  <div class="watermark">by:alef</div>
-
-  <script src="app.js"></script>
 </body>
 </html>
