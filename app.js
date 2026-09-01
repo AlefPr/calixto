@@ -5,14 +5,14 @@ const botoesFiltro = document.querySelectorAll('.filter-btn');
 let bancosDeDadosCidades = {};
 let filtroAtivo = 'todos'; 
 
-// 1. Loader de Dados
-fetch('./cidades.json') // Confirme sempre o nome do seu arquivo JSON aqui!
+// 1. Carregamento de Dados
+fetch('./cidades.json')
   .then(response => response.json())
   .then(data => {
     let cidadeAtual = "";
     let popAtual = "";
 
-    data.forEach(item => {
+    data.PLANOS.forEach(item => {
       if (!item) return;
 
       const colunaCidade = item[""] || item.Column1;
@@ -41,7 +41,7 @@ fetch('./cidades.json') // Confirme sempre o nome do seu arquivo JSON aqui!
   })
   .catch(error => console.error("Erro ao carregar banco:", error));
 
-// 2. Padronização
+// 2. Padronização e Estilização de Tags
 function formatarNomeServico(nome) {
   let n = nome.toLowerCase().trim();
   if (n === 'sky/paramout' || n === 'sky/paramount') return 'Sky/Paramount';
@@ -58,10 +58,11 @@ function obterClasseTag(servico) {
   if(s.includes('max')) return 'tag-max';
   if(s.includes('sky')) return 'tag-sky';
   if(s.includes('roteador')) return 'tag-roteador';
+  if(s.includes('scm') || s.includes('empresarial')) return 'tag-corp';
   return 'tag-default';
 }
 
-// 3. Motor Lógico (Parsing)
+// 3. Parsing Avançado
 function interpretarPlano(textoPlano) {
   let precoLimpo = 'Consulte';
   let descricao = textoPlano.trim();
@@ -98,7 +99,7 @@ function interpretarPlano(textoPlano) {
   return { velocidade, servicos: servicosFormatados, preco: precoLimpo, categoria };
 }
 
-// 4. Interface (Filtros)
+// 4. Controle de Filtros
 botoesFiltro.forEach(btn => {
   btn.addEventListener('click', (e) => {
     botoesFiltro.forEach(b => b.classList.remove('active'));
@@ -123,27 +124,14 @@ function renderizarBusca() {
     const dados = bancosDeDadosCidades[chave];
     const planosUnicos = [...new Set(dados.planos)];
     
-    // Tratamento de Taxas e Banners Promocionais
     const taxasUnicas = dados.taxas.filter((taxa, index, self) =>
       index === self.findIndex((t) => t.nome === taxa.nome)
     );
 
-    const taxasNormais = [];
-    const avisosPromocionais = [];
-
-    taxasUnicas.forEach(taxa => {
-      const nomeUpper = taxa.nome.toUpperCase();
-      if (nomeUpper.includes('DESCONTO') && !nomeUpper.includes('SEM DESCONTO')) {
-        avisosPromocionais.push(taxa);
-      } else {
-        taxasNormais.push(taxa);
-      }
-    });
-
     const planosProcessados = planosUnicos.map(interpretarPlano);
     const planosFiltrados = planosProcessados.filter(p => filtroAtivo === 'todos' || p.categoria === filtroAtivo);
 
-    // Algoritmo de Ordenação
+    // Sorting Lógico
     planosFiltrados.sort((a, b) => {
       const getSpeed = (str) => {
         if (!str || str === "N/A") return 0;
@@ -164,29 +152,14 @@ function renderizarBusca() {
       return getPrice(a.preco) - getPrice(b.preco);
     });
 
-    // Renderização das Linhas da Tabela (Com Lógica de Limpeza Visual para Planos Corp)
+    // Renderização das Linhas
     const linhasPlanosHtml = planosFiltrados.map(plano => {
-      let badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
-      let visualServicos = badgesServicos || '<span style="color: #52525b; font-weight: 700; letter-spacing: 2px;">—</span>';
-      let visualVelocidade = plano.velocidade;
-
-      // Se for corporativo, não renderiza a tag gigante. Joga um subtítulo elegante abaixo da velocidade.
-      if (plano.categoria === 'corp') {
-        visualServicos = '<span style="color: #52525b; font-weight: 700; letter-spacing: 2px;">—</span>';
-        visualVelocidade = `
-          <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span>${plano.velocidade}</span>
-            <span style="font-size: 11px; color: var(--text-muted); font-weight: 500; font-family: 'Inter', sans-serif;">Plano Empresarial (SCM)</span>
-          </div>
-        `;
-      }
+      const badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
+      const visualServicos = badgesServicos || '<span style="opacity: 0.4; font-size: 12px; font-style: italic;">Sem serviços adicionais</span>';
       
-      // Lógica segura para copiar informações
-      let infoServicosCopia = plano.servicos.length > 0 && plano.categoria !== 'corp' ? plano.servicos.join(', ') : (plano.categoria === 'corp' ? 'Link Dedicado SCM' : 'Nenhum');
-
       return `
         <div class="plan-row">
-          <div class="p-speed">${visualVelocidade}</div>
+          <div class="p-speed">${plano.velocidade}</div>
           <div class="p-services">${visualServicos}</div>
           <div class="price-wrapper">
             <span class="p-price font-mono">${plano.preco}</span>
@@ -194,36 +167,17 @@ function renderizarBusca() {
                     title="Copiar para WhatsApp"
                     data-cidade="${dados.cidade}"
                     data-velocidade="${plano.velocidade}"
-                    data-servicos="${infoServicosCopia}"
+                    data-servicos="${plano.servicos.length > 0 ? plano.servicos.join(', ') : 'Nenhum'}"
                     data-preco="${plano.preco}">
-              <i class="ph-duotone ph-copy" style="font-size: 20px;"></i>
+              <i class="ph-duotone ph-copy" style="font-size: 18px;"></i>
             </button>
           </div>
         </div>
       `;
     }).join('');
 
-    // Banners de Campanhas Ativas (Descontos)
-    let promosHtml = '';
-    if (avisosPromocionais.length > 0) {
-      promosHtml = `
-        <div class="section-title" style="margin-top: 30px; color: var(--accent-green);"><i class="ph-duotone ph-megaphone"></i> Campanhas Comerciais</div>
-        <div class="promo-container">
-          ${avisosPromocionais.map(p => `
-            <div class="promo-banner">
-              <div class="promo-icon"><i class="ph-duotone ph-ticket"></i></div>
-              <div class="promo-content">
-                <span class="promo-title">${p.nome.toLowerCase()}</span>
-                ${p.valor ? `<span class="promo-value">Condição Especial: ${p.valor}</span>` : '<span class="promo-value">Aproveite essa condição no momento do fechamento.</span>'}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    // Renderiza as Taxas Normais em tags discretas
-    const taxasHtml = taxasNormais.map(taxa => {
+    // RENDERIZAÇÃO DAS TAXAS COM NEON VERDE
+    const taxasHtml = taxasUnicas.map(taxa => {
       let displayValor = '';
       if (taxa.valor !== '') {
         if (isNaN(taxa.valor)) {
@@ -232,10 +186,20 @@ function renderizarBusca() {
           displayValor = `<span class="tax-price font-mono">- R$ ${Number(taxa.valor).toFixed(2).replace('.', ',')}</span>`;
         }
       }
-      return `<div class="tax-tag"><i class="ph-duotone ph-receipt tax-icon"></i> ${taxa.nome} ${displayValor}</div>`;
+
+      // Inteligência do Neon: Caça a palavra "DESCONTO" e adiciona as classes Premium
+      let classeExtra = '';
+      let icone = 'ph-receipt'; 
+      
+      if (taxa.nome.toUpperCase().includes('DESCONTO')) {
+        classeExtra = 'tax-discount';
+        icone = 'ph-ticket'; // Ícone de Etiqueta/Ticket promocional
+      }
+
+      return `<div class="tax-tag ${classeExtra}"><i class="ph-duotone ${icone} tax-icon"></i> ${taxa.nome} ${displayValor}</div>`;
     }).join('');
 
-    // Renderiza o Card Principal
+    // Montagem do Card HTML
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -245,15 +209,15 @@ function renderizarBusca() {
       </div>
 
       <div class="kpi-grid">
-        <div class="kpi-box" style="border-top-color: var(--accent-green); background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--bg-kpi) 100%);">
+        <div class="kpi-box" style="border-top-color: var(--accent-green);">
           <span class="kpi-title">Infraestrutura</span>
           <span class="kpi-value"><span class="pulse-dot"></span> Operacional</span>
         </div>
-        <div class="kpi-box" style="border-top-color: var(--accent-cyan); background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, var(--bg-kpi) 100%);">
+        <div class="kpi-box" style="border-top-color: var(--accent-cyan);">
           <span class="kpi-title">Tecnologia</span>
           <span class="kpi-value"><i class="ph-duotone ph-broadcast"></i> GPON / Metro</span>
         </div>
-        <div class="kpi-box" style="border-top-color: var(--accent-purple); background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, var(--bg-kpi) 100%);">
+        <div class="kpi-box" style="border-top-color: var(--accent-purple);">
           <span class="kpi-title">Matriz Comercial</span>
           <span class="kpi-value"><i class="ph-duotone ph-list-numbers"></i> ${planosProcessados.length} Registros</span>
         </div>
@@ -265,16 +229,14 @@ function renderizarBusca() {
           <div class="table-header">
             <div>Velocidade</div>
             <div>Serviços Adicionais</div>
-            <div style="text-align: right; padding-right: 40px;">Valor Mensal</div>
+            <div style="text-align: right; padding-right: 35px;">Valor Mensal</div>
           </div>
           ${linhasPlanosHtml}
         ` : '<div style="padding: 20px; color: var(--text-muted); text-align: center; font-size: 14px;">Nenhum plano corresponde ao filtro selecionado.</div>'}
       </div>
 
-      <div class="section-title"><i class="ph-duotone ph-wrench"></i> Taxas Operacionais</div>
+      <div class="section-title"><i class="ph-duotone ph-wrench"></i> Taxas e Descontos</div>
       <div class="tax-grid">${taxasHtml || '<span style="color: var(--text-muted); font-size: 14px; padding-left: 5px;">Nenhuma taxa cadastrada.</span>'}</div>
-      
-      ${promosHtml}
     `;
     
     divResultados.appendChild(card);
@@ -282,7 +244,7 @@ function renderizarBusca() {
 }
 
 // =========================================================
-// SISTEMA DE CÓPIA (WhatsApp / Chamados) E FEEDBACK (Toast)
+// SISTEMA DE CÓPIA PARA WHATSAPP E TOAST NOTIFICATION
 // =========================================================
 function mostrarToast(mensagem) {
   const container = document.getElementById('toast-container');
@@ -314,6 +276,6 @@ document.addEventListener('click', function(evento) {
     mostrarToast('Plano copiado com sucesso!');
   }).catch(erro => {
     console.error('Falha ao copiar:', erro);
-    alert('Erro ao copiar. Verifique se o navegador permite cópia.');
+    alert('Erro ao copiar. Verifique as permissões do navegador.');
   });
 });
