@@ -23,7 +23,7 @@ fetch('./cidades.json')
         popAtual = item.Column2 ? item.Column2.trim() : cidadeAtual;
         
         if (!bancosDeDadosCidades[cidadeAtual]) {
-          bancosDeDadosCidades[cidadeAtual] = { cidade: cidadeAtual, pop: popAtual, planos: [], taxas: [] };
+          bancosDeDadosCidades[cidadeAtual] = { cidade: cidadeAtual, pop: popAtual, planos: [], taxas: [], promocao: '' };
         }
       }
 
@@ -33,13 +33,25 @@ fetch('./cidades.json')
         
         if (item.Column7 && item.Column7.trim() !== "") {
           const nomeTaxa = item.Column7.trim();
-          const valorTaxa = item.Column8 !== undefined ? item.Column8 : '';
-          bancosDeDadosCidades[cidadeAtual].taxas.push({ nome: nomeTaxa, valor: valorTaxa });
+          if (/promocional/i.test(nomeTaxa) || /valor promocional/i.test(nomeTaxa)) {
+            bancosDeDadosCidades[cidadeAtual].promocao = nomeTaxa.replace(/\s+/g, ' ').trim();
+          } else {
+            const valorTaxa = item.Column8 !== undefined ? item.Column8 : '';
+            bancosDeDadosCidades[cidadeAtual].taxas.push({ nome: nomeTaxa, valor: valorTaxa });
+          }
         }
       }
     });
   })
   .catch(error => console.error("Erro ao carregar banco:", error));
+
+// 1.5 Normalização de Texto (Remove Acentos para Busca Tolerante)
+function normalizar(texto) {
+  return String(texto || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
 
 // 2. Padronização e Estilização de Tags
 function formatarNomeServico(nome) {
@@ -117,7 +129,7 @@ function renderizarBusca() {
   divResultados.innerHTML = '';
   if (termoDigitado.length < 2) return;
 
-  const chavesFiltradas = Object.keys(bancosDeDadosCidades).filter(nome => nome.toLowerCase().includes(termoDigitado));
+  const chavesFiltradas = Object.keys(bancosDeDadosCidades).filter(nome => normalizar(nome).includes(normalizar(termoDigitado)));
   if (chavesFiltradas.length === 0) return;
 
   chavesFiltradas.forEach(chave => {
@@ -207,6 +219,13 @@ function renderizarBusca() {
         <h3><i class="ph-duotone ph-map-pin"></i> ${dados.cidade}</h3>
         <span class="pop-badge"><i class="ph-duotone ph-share-network"></i> POP: ${dados.pop}</span>
       </div>
+
+      ${dados.promocao ? `
+        <div class="promo-banner">
+          <i class="ph-duotone ph-megaphone promo-icon"></i>
+          <span class="promo-text">${dados.promocao}</span>
+        </div>
+      ` : ''}
 
       <div class="kpi-grid">
         <div class="kpi-box" style="border-top-color: var(--accent-green);">
