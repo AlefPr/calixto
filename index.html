@@ -65,7 +65,7 @@
     }
     .header-container h2 i { color: var(--accent-cyan); }
 
-    /* Barra de Busca */
+    /* Barra de Busca (Agora perfeitamente alinhada com a Box) */
     #busca-cidade {
       width: 100%; padding: 18px 24px; font-size: 16px; border-radius: 12px; 
       border: 1px solid var(--border-color); background-color: var(--bg-card); 
@@ -118,7 +118,7 @@
     }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
-    /* Títulos de Seção Original (Usado pelo app.js) */
+    /* Títulos de Seção */
     .section-title { 
       font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; 
       color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; 
@@ -132,7 +132,7 @@
     .table-header {
       display: grid; grid-template-columns: 120px 1fr 140px; gap: 15px;
       padding: 12px 20px; font-size: 10px; text-transform: uppercase;
-      letter-spacing: 1px; color: var(--text-muted); font-weight: 700; 
+      letter-spacing: 1px; color: var(--text-muted); font-weight: 700; /* Contraste Corrigido */
       border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.3);
     }
     .plan-row {
@@ -149,6 +149,7 @@
     .price-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
     .p-price { font-size: 15px; color: var(--text-main); text-align: right; }
 
+    /* Botão de Copiar Oculto (Aparece no Hover da Linha) */
     .copy-btn {
       background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; 
       border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;
@@ -160,12 +161,14 @@
     .copy-btn:hover { color: var(--accent-cyan) !important; background: rgba(6, 182, 212, 0.15) !important; }
     .copy-btn:active { transform: scale(0.9) !important; }
     
+    /* Tags de Serviços */
     .service-tag { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
     .tag-deezer { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
     .tag-max { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
     .tag-sky { background: rgba(225, 29, 72, 0.15); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.3); }
     .tag-roteador { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
 
+    /* Tags Padrão (Taxas) */
     .tax-grid { display: flex; flex-wrap: wrap; gap: 12px; }
     .tax-tag {
       background: var(--bg-kpi); border: 1px solid var(--border-color); color: var(--text-muted); 
@@ -175,6 +178,7 @@
     .tax-price { color: var(--text-main); font-weight: 600; margin-left: 6px; }
     .tax-icon { color: var(--accent-gold); }
 
+    /* Banners Promocionais Elegantes */
     .promo-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
     .promo-banner {
       display: flex; align-items: center; gap: 15px; padding: 14px 20px;
@@ -186,9 +190,11 @@
     .promo-icon i { font-size: 24px; color: var(--accent-green); }
     .promo-content { display: flex; flex-direction: column; justify-content: center; }
     
+    /* Tipografia Corrigida para Campanhas (Sai o CAPS LOCK) */
     .promo-title { font-size: 13px; font-weight: 700; color: var(--accent-green); letter-spacing: 0.5px; text-transform: capitalize; }
     .promo-value { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-style: italic; }
 
+    /* Toast Notification (Feedback) */
     #toast-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
     .toast {
       background: var(--bg-card); border: 1px solid var(--accent-green); color: var(--text-main); 
@@ -199,60 +205,18 @@
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
 
+    /* Assinatura Otimizada */
     .watermark { 
       position: fixed; bottom: 15px; left: 20px; font-size: 12px; color: var(--text-muted); 
       font-family: 'JetBrains Mono', monospace; opacity: 0.5; pointer-events: none; 
       z-index: 1000; letter-spacing: 1px; 
     }
 
-    /* ========================================================
-       ESTILOS EXCLUSIVOS DAS OFERTAS (SEM CONFLITO COM APP.JS)
-       ======================================================== */
-    #bloco-ofertas-fixas {
-      transition: opacity 0.3s ease, height 0.3s ease;
-    }
-    .ofertas-titulo-isolado { 
-      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; 
-      color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; 
-    }
-    .ofertas-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px; margin-bottom: 35px;
-    }
-    .oferta-card {
-      background: var(--bg-card); border: 1px solid var(--border-glow); border-radius: 12px;
-      padding: 25px; position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      transition: all 0.3s ease; overflow: hidden;
-    }
-    .oferta-card:hover { transform: translateY(-4px); border-color: var(--accent-cyan); }
-    .oferta-adesao { border-top: 4px solid var(--accent-gold); }
-    .oferta-pontualidade { border-top: 4px solid var(--accent-green); }
-    
-    .oferta-badge {
-      position: absolute; top: 15px; right: 15px; font-size: 11px; font-weight: 700;
-      padding: 4px 10px; border-radius: 6px; letter-spacing: 0.5px;
-    }
-    .oferta-adesao .oferta-badge { background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); border: 1px solid rgba(245, 158, 11, 0.3); }
-    .oferta-pontualidade .oferta-badge { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
-
-    .oferta-title { font-size: 1.2rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .oferta-adesao .oferta-title i { color: var(--accent-gold); }
-    .oferta-pontualidade .oferta-title i { color: var(--accent-green); }
-
-    .oferta-price { font-size: 2.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: baseline; gap: 5px; }
-    .oferta-price span { font-size: 1rem; color: var(--text-muted); font-weight: 500; }
-
-    .oferta-details { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .oferta-details li { font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
-    .oferta-details li i { color: var(--accent-cyan); margin-top: 2px; font-size: 1.1rem; }
-
   </style>
 </head>
 <body>
 
   <div class="main-container">
-    
-    <!-- Cabeçalho Original (Intacto) -->
     <div class="header-container">
       <h2><i class="ph-duotone ph-hard-drives"></i> NOC | Cobertura Comercial</h2>
       <input type="text" id="busca-cidade" placeholder="Digite a cidade ou região (ex: Palmas)..." autocomplete="off">
@@ -265,66 +229,11 @@
       </div>
     </div>
 
-    <!-- ==========================================================
-         SEÇÃO ISOLADA DE OFERTAS (SOME AO PESQUISAR)
-         ========================================================== -->
-    <div id="bloco-ofertas-fixas">
-      <div class="ofertas-titulo-isolado">
-        <i class="ph-duotone ph-megaphone"></i> Campanhas e Benefícios Vigentes
-      </div>
-
-      <div class="ofertas-grid">
-        <!-- Oferta 700 Mbps -->
-        <div class="oferta-card oferta-adesao">
-          <div class="oferta-badge">NOVA ADESÃO</div>
-          <div class="oferta-title"><i class="ph-duotone ph-rocket-launch"></i> Plano 700 Mbps</div>
-          <div class="oferta-price">R$ 49,99 <span>/mês</span></div>
-          <ul class="oferta-details">
-            <li><i class="ph-bold ph-check"></i> <span><strong>Valor promocional:</strong> Válido durante os 3 primeiros meses (pagando até o vencimento).</span></li>
-            <li><i class="ph-bold ph-check"></i> <span><strong>Valor regular:</strong> A partir do 4º mês passa a ser R$ 109,99/mês.</span></li>
-            <li><i class="ph-bold ph-check"></i> <span><strong>Cidades elegíveis:</strong> Augustinópolis, Axixá do TO, Sampaio, Sítio Novo do TO e Praia Norte.</span></li>
-          </ul>
-        </div>
-
-        <!-- Benefício Pontualidade -->
-        <div class="oferta-card oferta-pontualidade">
-          <div class="oferta-badge">BENEFÍCIO FIXO</div>
-          <div class="oferta-title"><i class="ph-duotone ph-wallet"></i> Desconto Pontualidade</div>
-          <div class="oferta-price">R$ 10,00 <span>OFF</span></div>
-          <ul class="oferta-details">
-            <li><i class="ph-bold ph-check"></i> <span><strong>Desconto automático:</strong> Aplicado todo mês ao pagar a fatura até a data de vencimento.</span></li>
-            <li><i class="ph-bold ph-check"></i> <span><strong>Planos elegíveis:</strong> Válido para assinantes dos planos de 600 Mbps e 800 Mbps.</span></li>
-            <li><i class="ph-bold ph-check"></i> <span><strong>Cidades cobertas:</strong> Palmas, Porto Nacional, e demais cidades (Guaraí válido para 800 Mbps).</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Div original onde o app.js vai injetar os resultados -->
     <div id="resultados"></div>
-    
   </div>
   
   <div id="toast-container"></div>
   <div class="watermark">by:alef</div>
-
-  <!-- Pequeno script para esconder as ofertas quando o usuário começar a digitar -->
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const inputBusca = document.getElementById('busca-cidade');
-      const blocoOfertas = document.getElementById('bloco-ofertas-fixas');
-      
-      if(inputBusca && blocoOfertas) {
-        inputBusca.addEventListener('input', function(e) {
-          if(e.target.value.trim().length > 0) {
-            blocoOfertas.style.display = 'none';
-          } else {
-            blocoOfertas.style.display = 'block';
-          }
-        });
-      }
-    });
-  </script>
 
   <script src="app.js"></script>
 </body>
