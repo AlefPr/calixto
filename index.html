@@ -35,11 +35,25 @@
       padding: 40px 20px;
       max-width: 950px;
       margin: 0 auto;
+      min-height: 100vh;
       background-color: var(--bg-app);
+      background-image:
+        radial-gradient(600px 400px at 15% -5%, rgba(6, 182, 212, 0.08), transparent 70%),
+        radial-gradient(700px 500px at 110% 110%, rgba(139, 92, 246, 0.07), transparent 70%);
+      background-attachment: fixed;
       color: var(--text-main);
     }
 
     .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    mark { background: transparent; color: var(--accent-cyan); font-weight: 700; }
+
+    /* Scrollbar customizada */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg-app); }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 8px; border: 2px solid var(--bg-app); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+    * { scrollbar-width: thin; scrollbar-color: #27272a var(--bg-app); }
 
     .header-container { text-align: center; margin-bottom: 35px; }
     .header-container h2 { 
@@ -49,8 +63,15 @@
     }
     .header-container h2 i { color: var(--accent-cyan); }
 
+    .search-wrapper { position: relative; max-width: 640px; margin: 0 auto; }
+
+    .search-icon {
+      position: absolute; left: 22px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 22px; pointer-events: none; z-index: 2;
+    }
+
     #busca-cidade {
-      width: 100%; padding: 18px 24px; font-size: 16px; border-radius: 12px; 
+      width: 100%; padding: 18px 52px; font-size: 16px; border-radius: 12px; 
       border: 1px solid var(--border-color); background-color: var(--bg-card); 
       color: var(--text-main); outline: none; box-shadow: 0 8px 30px rgba(0,0,0,0.4); 
       transition: all 0.3s ease;
@@ -59,6 +80,53 @@
       border-color: var(--accent-cyan); 
       box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), 0 8px 30px rgba(0,0,0,0.5); 
     }
+
+    .clear-btn {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 20px; cursor: pointer; z-index: 2;
+      padding: 4px; border-radius: 50%; display: none; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .clear-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.08); }
+    .clear-btn.visible { display: inline-flex; }
+
+    .sugestoes {
+      position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 50;
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden; text-align: left;
+      display: none;
+    }
+    .sugestoes.visible { display: block; }
+    .sugestao-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 20px; cursor: pointer;
+      font-size: 14px; font-weight: 500; color: var(--text-main); transition: all 0.15s;
+    }
+    .sugestao-item i { color: var(--accent-cyan); font-size: 16px; }
+    .sugestao-item:hover { background: rgba(6, 182, 212, 0.08); }
+    .sugestao-item mark { color: var(--accent-cyan); }
+    .sugestao-item + .sugestao-item { border-top: 1px solid var(--border-color); }
+    .sugestao-vazia { padding: 14px 20px; color: var(--text-muted); font-size: 13px; text-align: center; }
+
+    .contador-resultados {
+      margin-top: 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.8px;
+      text-transform: uppercase; color: var(--text-muted); display: none;
+    }
+    .contador-resultados.visible { display: block; }
+    .contador-resultados b { color: var(--accent-cyan); }
+
+    .estado-busca {
+      text-align: center; padding: 60px 20px; color: var(--text-muted); display: none;
+      flex-direction: column; align-items: center; gap: 14px;
+    }
+    .estado-busca.visible { display: flex; }
+    .estado-busca i { font-size: 40px; color: #3f3f46; }
+    .estado-busca .estado-texto { font-size: 15px; }
+    .spinner {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 3px solid rgba(6, 182, 212, 0.15); border-top-color: var(--accent-cyan);
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .filter-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px; }
     .filter-btn {
@@ -75,6 +143,11 @@
     .card {
       border: 1px solid var(--border-glow); padding: 30px; border-radius: 16px; 
       margin-bottom: 25px; background: var(--bg-card); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    .card-enter { animation: cardEnter 0.35s ease both; }
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
     .card-header { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
@@ -212,13 +285,39 @@
       z-index: 1000;
     }
 
+    /* Classes auxiliares (sem estilos inline soltos) */
+    .plano-sem-servicos { opacity: 0.4; font-size: 12px; font-style: italic; }
+    .taxas-vazias { color: var(--text-muted); font-size: 14px; padding-left: 5px; }
+    .sem-planos-aviso { padding: 20px; color: var(--text-muted); text-align: center; font-size: 14px; }
+    .valor-col { text-align: right; padding-right: 35px; }
+
+    /* Responsividade Mobile */
+    @media (max-width: 640px) {
+      body { padding: 24px 12px; }
+      .card { padding: 20px 16px; }
+      .card-header h3 { font-size: 1.5rem; }
+      .table-header { display: none; }
+      .plan-row {
+        grid-template-columns: 1fr;
+        gap: 8px; padding: 14px 12px;
+      }
+      .price-wrapper { justify-content: space-between; }
+      .filter-btn { flex: 1 1 calc(50% - 12px); justify-content: center; }
+    }
+
   </style>
 </head>
 <body>
 
   <div class="header-container">
     <h2><i class="ph-duotone ph-hard-drives"></i> NOC | Cobertura Comercial</h2>
-    <input type="text" id="busca-cidade" placeholder="Digite a cidade ou região (ex: Palmas)..." autocomplete="off">
+    <div class="search-wrapper">
+      <i class="ph-duotone ph-magnifying-glass search-icon"></i>
+      <input type="text" id="busca-cidade" placeholder="Digite a cidade ou região (ex: Palmas)..." autocomplete="off">
+      <span class="clear-btn" id="clear-btn" title="Limpar busca"><i class="ph-duotone ph-x"></i></span>
+      <div id="sugestoes" class="sugestoes"></div>
+    </div>
+    <div id="contador-resultados" class="contador-resultados"></div>
     
     <div class="filter-container">
       <button class="filter-btn active" data-filter="todos"><i class="ph-duotone ph-squares-four"></i> Todos os Planos</button>
@@ -228,6 +327,7 @@
     </div>
   </div>
 
+  <div id="estado-busca" class="estado-busca"></div>
   <div id="resultados"></div>
   
   <div id="toast-container"></div>

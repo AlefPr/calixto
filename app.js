@@ -1,11 +1,29 @@
 const inputBusca = document.getElementById('busca-cidade');
 const divResultados = document.getElementById('resultados');
 const botoesFiltro = document.querySelectorAll('.filter-btn');
+const divSugestoes = document.getElementById('sugestoes');
+const divEstado = document.getElementById('estado-busca');
+const divContador = document.getElementById('contador-resultados');
+const btnLimpar = document.getElementById('clear-btn');
 
 let bancosDeDadosCidades = {};
-let filtroAtivo = 'todos'; 
+let filtroAtivo = 'todos';
+let dadosCarregados = false;
+
+// 0. Estados de Loading / Vazio
+function mostrarEstado(html) {
+  divEstado.innerHTML = html;
+  divEstado.classList.add('visible');
+}
+
+function esconderEstado() {
+  divEstado.classList.remove('visible');
+  divEstado.innerHTML = '';
+}
 
 // 1. Carregamento de Dados
+mostrarEstado('<span class="spinner"></span><span class="estado-texto">Carregando dados das cidades...</span>');
+
 fetch('./cidades.json')
   .then(response => response.json())
   .then(data => {
@@ -42,8 +60,15 @@ fetch('./cidades.json')
         }
       }
     });
+
+    dadosCarregados = true;
+    esconderEstado();
   })
-  .catch(error => console.error("Erro ao carregar banco:", error));
+  .catch(error => {
+    console.error("Erro ao carregar banco:", error);
+    dadosCarregados = true;
+    mostrarEstado('<i class="ph-duotone ph-warning-circle"></i><span class="estado-texto">Erro ao carregar os dados. Recarregue a página.</span>');
+  });
 
 // 1.5 Normalização de Texto (Remove Acentos para Busca Tolerante)
 function normalizar(texto) {
@@ -51,6 +76,37 @@ function normalizar(texto) {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
+}
+
+// 1.6 Utilitários de Renderização Segura e Destaque
+function escaparHtml(texto) {
+  return String(texto || '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[c]);
+}
+
+function destacarTermo(texto, termo) {
+  const termoNorm = normalizar(termo);
+  if (!texto || !termoNorm) return escaparHtml(texto);
+
+  const normText = normalizar(texto);
+  const pos = normText.indexOf(termoNorm);
+  if (pos === -1) return escaparHtml(texto);
+
+  const html = [];
+  let normPos = 0;
+  let inMark = false;
+  const fim = pos + termoNorm.length;
+
+  for (const ch of texto) {
+    const base = ch.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (!inMark && normPos === pos) { html.push('<mark>'); inMark = true; }
+    if (inMark && normPos === fim) { html.push('</mark>'); inMark = false; }
+    html.push(escaparHtml(ch));
+    if (base) normPos++;
+  }
+  if (inMark) html.push('</mark>');
+  return html.join('');
 }
 
 // 2. Padronização e Estilização de Tags
@@ -121,16 +177,120 @@ botoesFiltro.forEach(btn => {
   });
 });
 
-inputBusca.addEventListener('input', renderizarBusca);
+// 5. Autocomplete (Sugestões)
+function obterSugestoes(termo) {
+  const termoNorm = normalizar(termo);
+  if (termoNorm.length < 1) return [];
+  return Object.values(bancosDeDadosCidades)
+    .filter(d => normalizar(d.cidade).includes(termoNorm))
+    .slice(0, 8);
+}
 
-// 5. Renderização do Painel Completo
-function renderizarBusca() {
-  const termoDigitado = inputBusca.value.toLowerCase().trim();
+function renderizarSugestoes() {
+  const termo = inputBusca.value.trim();
+  if (!dadosCarregados || termo.length === 0) {
+    divSugestoes.classList.remove('visible');
+    return;
+  }
+
+  const sugestoes = obterSugestoes(termo);
+  if (sugestoes.length === 0) {
+    divSugestoes.innerHTML = '<div class="sugestao-vazia">Nenhuma sugestão para este termo.</div>';
+    divSugestoes.classList.add('visible');
+    return;
+  }
+
+  divSugestoes.innerHTML = sugestoes.map(d => `
+    <div class="sugestao-item" data-chave="${d.cidade}">
+      <i class="ph-duotone ph-map-pin"></i> ${destacarTermo(d.cidade, termo)}
+    </div>
+  `).join('');
+  divSugestoes.classList.add('visible');
+}
+
+function selecionarSugestao(chave) {
+  const dados = bancosDeDadosCidades[chave];
+  if (!dados) return;
+  inputBusca.value = dados.cidade;
+  divSugestoes.classList.remove('visible');
+  atualizarBotaoLimpar();
+  renderizarBusca();
+}
+
+divSugestoes.addEventListener('mousedown', (e) => e.preventDefault());
+
+divSugestoes.addEventListener('click', (e) => {
+  const item = e.target.closest('.sugestao-item');
+  if (item) selecionarSugestao(item.getAttribute('data-chave'));
+});
+
+function atualizarBotaoLimpar() {
+  btnLimpar.classList.toggle('visible', inputBusca.value.length > 0);
+}
+
+btnLimpar.addEventListener('click', () => {
+  inputBusca.value = '';
+  atualizarBotaoLimpar();
+  divSugestoes.classList.remove('visible');
+  divContador.classList.remove('visible');
   divResultados.innerHTML = '';
-  if (termoDigitado.length < 2) return;
+  esconderEstado();
+  inputBusca.focus();
+});
 
-  const chavesFiltradas = Object.keys(bancosDeDadosCidades).filter(nome => normalizar(nome).includes(normalizar(termoDigitado)));
-  if (chavesFiltradas.length === 0) return;
+inputBusca.addEventListener('input', () => {
+  atualizarBotaoLimpar();
+  renderizarSugestoes();
+  renderizarBusca();
+});
+
+inputBusca.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const primeiro = divSugestoes.querySelector('.sugestao-item');
+    if (primeiro) {
+      e.preventDefault();
+      selecionarSugestao(primeiro.getAttribute('data-chave'));
+    }
+  } else if (e.key === 'Escape') {
+    divSugestoes.classList.remove('visible');
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.search-wrapper')) {
+    divSugestoes.classList.remove('visible');
+  }
+});
+
+// 6. Renderização do Painel Completo
+function renderizarBusca() {
+  const termoDigitado = inputBusca.value.trim();
+  divResultados.innerHTML = '';
+
+  if (termoDigitado.length < 2) {
+    divContador.classList.remove('visible');
+    esconderEstado();
+    return;
+  }
+
+  if (!dadosCarregados) {
+    divContador.classList.remove('visible');
+    mostrarEstado('<span class="spinner"></span><span class="estado-texto">Carregando dados das cidades...</span>');
+    return;
+  }
+
+  const termoNorm = normalizar(termoDigitado);
+  const chavesFiltradas = Object.keys(bancosDeDadosCidades).filter(nome => normalizar(nome).includes(termoNorm));
+
+  if (chavesFiltradas.length === 0) {
+    divContador.classList.remove('visible');
+    mostrarEstado(`<i class="ph-duotone ph-magnifying-glass"></i><span class="estado-texto">Nenhuma cidade encontrada para "<b>${escaparHtml(termoDigitado)}</b>".</span>`);
+    return;
+  }
+
+  esconderEstado();
+  divContador.innerHTML = `<b>${chavesFiltradas.length}</b> ${chavesFiltradas.length === 1 ? 'cidade encontrada' : 'cidades encontradas'}`;
+  divContador.classList.add('visible');
 
   chavesFiltradas.forEach(chave => {
     const dados = bancosDeDadosCidades[chave];
@@ -167,7 +327,7 @@ function renderizarBusca() {
     // Renderização das Linhas
     const linhasPlanosHtml = planosFiltrados.map(plano => {
       const badgesServicos = plano.servicos.map(s => `<span class="service-tag ${obterClasseTag(s)}">${s}</span>`).join('');
-      const visualServicos = badgesServicos || '<span style="opacity: 0.4; font-size: 12px; font-style: italic;">Sem serviços adicionais</span>';
+      const visualServicos = badgesServicos || '<span class="plano-sem-servicos">Sem serviços adicionais</span>';
       
       return `
         <div class="plan-row">
@@ -199,13 +359,12 @@ function renderizarBusca() {
         }
       }
 
-      // Inteligência do Neon: Caça a palavra "DESCONTO" e adiciona as classes Premium
       let classeExtra = '';
       let icone = 'ph-receipt'; 
       
       if (taxa.nome.toUpperCase().includes('DESCONTO')) {
         classeExtra = 'tax-discount';
-        icone = 'ph-ticket'; // Ícone de Etiqueta/Ticket promocional
+        icone = 'ph-ticket';
       }
 
       return `<div class="tax-tag ${classeExtra}"><i class="ph-duotone ${icone} tax-icon"></i> ${taxa.nome} ${displayValor}</div>`;
@@ -213,17 +372,17 @@ function renderizarBusca() {
 
     // Montagem do Card HTML
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'card card-enter';
     card.innerHTML = `
       <div class="card-header">
-        <h3><i class="ph-duotone ph-map-pin"></i> ${dados.cidade}</h3>
-        <span class="pop-badge"><i class="ph-duotone ph-share-network"></i> POP: ${dados.pop}</span>
+        <h3><i class="ph-duotone ph-map-pin"></i> ${destacarTermo(dados.cidade, termoDigitado)}</h3>
+        <span class="pop-badge"><i class="ph-duotone ph-share-network"></i> POP: ${escaparHtml(dados.pop)}</span>
       </div>
 
       ${dados.promocao ? `
         <div class="promo-banner">
           <i class="ph-duotone ph-megaphone promo-icon"></i>
-          <span class="promo-text">${dados.promocao}</span>
+          <span class="promo-text">${escaparHtml(dados.promocao)}</span>
         </div>
       ` : ''}
 
@@ -248,14 +407,14 @@ function renderizarBusca() {
           <div class="table-header">
             <div>Velocidade</div>
             <div>Serviços Adicionais</div>
-            <div style="text-align: right; padding-right: 35px;">Valor Mensal</div>
+            <div class="valor-col">Valor Mensal</div>
           </div>
           ${linhasPlanosHtml}
-        ` : '<div style="padding: 20px; color: var(--text-muted); text-align: center; font-size: 14px;">Nenhum plano corresponde ao filtro selecionado.</div>'}
+        ` : '<div class="sem-planos-aviso">Nenhum plano corresponde ao filtro selecionado.</div>'}
       </div>
 
       <div class="section-title"><i class="ph-duotone ph-wrench"></i> Taxas e Descontos</div>
-      <div class="tax-grid">${taxasHtml || '<span style="color: var(--text-muted); font-size: 14px; padding-left: 5px;">Nenhuma taxa cadastrada.</span>'}</div>
+      <div class="tax-grid">${taxasHtml || '<span class="taxas-vazias">Nenhuma taxa cadastrada.</span>'}</div>
     `;
     
     divResultados.appendChild(card);
